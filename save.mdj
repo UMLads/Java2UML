@@ -61,7 +61,7 @@
 											"font": "Arial;13;1",
 											"left": 253,
 											"top": 375,
-											"width": 111.642578125,
+											"width": 193.29248046875,
 											"height": 13,
 											"text": "Class1"
 										},
@@ -96,7 +96,7 @@
 									"font": "Arial;13;0",
 									"left": 248,
 									"top": 368,
-									"width": 121.642578125,
+									"width": 203.29248046875,
 									"height": 25,
 									"stereotypeLabel": {
 										"$ref": "AAAAAAF8VKM6AG3rrrM="
@@ -133,7 +133,7 @@
 											"font": "Arial;13;0",
 											"left": 253,
 											"top": 398,
-											"width": 111.642578125,
+											"width": 193.29248046875,
 											"height": 13,
 											"text": "+Attribute1: string",
 											"horizontalAlignment": 0
@@ -142,7 +142,7 @@
 									"font": "Arial;13;0",
 									"left": 248,
 									"top": 393,
-									"width": 121.642578125,
+									"width": 203.29248046875,
 									"height": 23
 								},
 								{
@@ -167,16 +167,16 @@
 											"font": "Arial;13;0",
 											"left": 253,
 											"top": 421,
-											"width": 111.642578125,
+											"width": 193.29248046875,
 											"height": 13,
-											"text": "+Operation1(): void",
+											"text": "+Operation1(test: string): void",
 											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 248,
 									"top": 416,
-									"width": 121.642578125,
+									"width": 203.29248046875,
 									"height": 23
 								},
 								{
@@ -216,7 +216,7 @@
 							"containerChangeable": true,
 							"left": 248,
 							"top": 368,
-							"width": 121.642578125,
+							"width": 203.29248046875,
 							"height": 71,
 							"nameCompartment": {
 								"$ref": "AAAAAAF8VKM6AG3qOHs="
@@ -469,7 +469,7 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": 464,
+									"left": 505,
 									"top": 382,
 									"height": 13,
 									"alpha": 1.5707963267948966,
@@ -490,7 +490,7 @@
 									},
 									"visible": null,
 									"font": "Arial;13;0",
-									"left": 464,
+									"left": 505,
 									"top": 367,
 									"height": 13,
 									"alpha": 1.5707963267948966,
@@ -511,7 +511,7 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": 464,
+									"left": 505,
 									"top": 412,
 									"height": 13,
 									"alpha": -1.5707963267948966,
@@ -531,7 +531,7 @@
 										"$ref": "AAAAAAF8VKbusnATEJU="
 									},
 									"font": "Arial;13;0",
-									"left": 363,
+									"left": 444,
 									"top": 382,
 									"width": 64.6572265625,
 									"height": 13,
@@ -554,7 +554,7 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": 398,
+									"left": 479,
 									"top": 368,
 									"height": 13,
 									"alpha": 0.7853981633974483,
@@ -574,9 +574,9 @@
 										"$ref": "AAAAAAF8VKbusnATEJU="
 									},
 									"font": "Arial;13;0",
-									"left": 389,
+									"left": 469,
 									"top": 409,
-									"width": 5.05908203125,
+									"width": 6.5,
 									"height": 13,
 									"alpha": -0.5235987755982988,
 									"distance": 25,
@@ -637,9 +637,9 @@
 										"$ref": "AAAAAAF8VKbusnAUoDo="
 									},
 									"font": "Arial;13;0",
-									"left": 535,
+									"left": 534,
 									"top": 409,
-									"width": 5.05908203125,
+									"width": 6.5,
 									"height": 13,
 									"alpha": 0.5235987755982988,
 									"distance": 25,
@@ -685,7 +685,7 @@
 								"$ref": "AAAAAAF8VKM6AG3p464="
 							},
 							"lineStyle": 1,
-							"points": "370:403;559:403",
+							"points": "451:403;559:403",
 							"showVisibility": true,
 							"nameLabel": {
 								"$ref": "AAAAAAF8VKbus3AXb5U="
@@ -793,6 +793,15 @@
 									},
 									"type": "void",
 									"direction": "return"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAF8YW2OByvqdg0=",
+									"_parent": {
+										"$ref": "AAAAAAF8VKN2hW5Dmwk="
+									},
+									"name": "test",
+									"type": "string"
 								}
 							]
 						}

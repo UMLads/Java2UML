@@ -7,6 +7,22 @@ public class UMLClass extends UMLObject {
     private ArrayList<UMLOperation> operations;
     private ArrayList<UMLAssociation> associations;
 
+    @Override
+    public String toString() {
+        String s = super.toString();
+        s = s.substring(0, s.length()-2) + " contains :\n";
+        for (UMLAttribute umlAttribute : attributes) {
+            s += '\t' + umlAttribute.toString();
+        }
+        for (UMLOperation umlOperation : operations) {
+            s += '\t' + umlOperation.toString();
+        }
+        for (UMLAssociation umlAssociation : associations) {
+            s += '\t' + umlAssociation.toString();
+        }
+        return s;
+    }
+
     public UMLClass() {
         super();
         attributes = new ArrayList<>();

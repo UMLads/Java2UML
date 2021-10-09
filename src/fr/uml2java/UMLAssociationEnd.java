@@ -10,6 +10,12 @@ public class UMLAssociationEnd extends UMLObject {
     private Visibility visibility;
     private String multiplicity;
 
+    @Override
+    public String toString() {
+        return super.toString() + "\tis a : " + this.getClass().getSimpleName() + " with visibility : "
+                + visibility.toString() + "; with multiplicity : " + multiplicity + '\n';
+    }
+
     public Visibility getVisibility() {
         return visibility;
     }

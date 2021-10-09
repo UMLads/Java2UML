@@ -8,6 +8,12 @@ public class UMLObject {
     private String reference;
     private String parent;
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName().toString() + "; name : " + name + "; id : " + id
+                + "; reference : " + reference + "; \n";
+    }
+
     public UMLObject() {}
 
     public UMLObject(String name, String id, String reference, String parent) {

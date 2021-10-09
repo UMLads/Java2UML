@@ -1,25 +1,29 @@
 package fr.uml2java;
 
-public class UMLAttribute extends UMLObject {
-    private String type;
+public class UMLParameter extends UMLAttribute {
+    boolean isReturn;
 
     @Override
     public String toString() {
         String s = super.toString();
-        s = s.substring(0, s.length() - 2);
-        return s + " type : "  + type + '\n';
+        s = s.substring(0, s.length() - 1);
+        return s + " and " + (isReturn ? "is return type" : "is not return type") + '\n';
     }
 
-    public UMLAttribute() {
-        super();
+    public boolean isReturn() {
+        return isReturn;
+    }
+
+    public void setReturn(boolean isReturn) {
+        this.isReturn = isReturn;
     }
 
     public String getType() {
-        return type;
+        return super.getType();
     }
 
     public void setType(String type) {
-        this.type = type;
+        super.setType(type);
     }
 
     public String getName() {

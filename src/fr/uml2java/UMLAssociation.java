@@ -5,6 +5,15 @@ import java.util.ArrayList;
 public class UMLAssociation extends UMLObject {
     private ArrayList<UMLAssociationEnd> associationEnds;
 
+    @Override
+    public String toString() {
+        String s = "";
+        for (UMLAssociationEnd umlAssociation : associationEnds) {
+            s += umlAssociation.toString();
+        }
+        return super.toString() + "\t with associations " + s;
+    }
+
     public ArrayList<UMLAssociationEnd> getAssociationEnds() {
         return associationEnds;
     }
