@@ -1,0 +1,49 @@
+				{
+					"_type": "UMLClass",
+					"_id": "AAAAAAF8a08gh4sqBXk=",
+					"_parent": {
+						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
+					},
+					"name": "Class1",
+					"ownedElements": [
+						{
+							"_type": "UMLAssociation",
+							"_id": "AAAAAAF8a09ISIt8mZw=",
+							"_parent": {
+								"$ref": "AAAAAAF8a08gh4sqBXk="
+							},
+							"end1": {
+								"_type": "UMLAssociationEnd",
+								"_id": "AAAAAAF8a09ISYt9xYU=",
+								"_parent": {
+									"$ref": "AAAAAAF8a09ISIt8mZw="
+								},
+								"reference": {
+									"$ref": "AAAAAAF8a08gh4sqBXk="
+								}
+							},
+							"end2": {
+								"_type": "UMLAssociationEnd",
+								"_id": "AAAAAAF8a09ISYt+Nws=",
+								"_parent": {
+									"$ref": "AAAAAAF8a09ISIt8mZw="
+								},
+								"reference": {
+									"$ref": "AAAAAAF8a08wl4tT4VE="
+								}
+							}
+						}
+					]
+				},
+				{
+					"_type": "UMLClass",
+					"_id": "AAAAAAF8a08wl4tT4VE=",
+					"_parent": {
+						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
+					},
+					"name": "Class2"
+				}
+			]
+		}
+	]
+}
