@@ -1,47 +1,54 @@
 				{
 					"_type": "UMLClass",
-					"_id": "AAAAAAF8a08gh4sqBXk=",
+					"_id": "AAAAAAF8rRv1ivCM72g=",
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Class1",
+					"name": "Promotion",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
-							"_id": "AAAAAAF8a09ISIt8mZw=",
+							"_id": "AAAAAAF8rRxWTfDic1E=",
 							"_parent": {
-								"$ref": "AAAAAAF8a08gh4sqBXk="
+								"$ref": "AAAAAAF8rRv1ivCM72g="
 							},
+							"name": "appartien/contient",
 							"end1": {
 								"_type": "UMLAssociationEnd",
-								"_id": "AAAAAAF8a09ISYt9xYU=",
+								"_id": "AAAAAAF8rRxWTvDju3A=",
 								"_parent": {
-									"$ref": "AAAAAAF8a09ISIt8mZw="
+									"$ref": "AAAAAAF8rRxWTfDic1E="
 								},
+								"name": "m_promotion",
 								"reference": {
-									"$ref": "AAAAAAF8a08gh4sqBXk="
-								}
+									"$ref": "AAAAAAF8rRv1ivCM72g="
+								},
+								"visibility": "private",
+								"multiplicity": "1"
 							},
 							"end2": {
 								"_type": "UMLAssociationEnd",
-								"_id": "AAAAAAF8a09ISYt+Nws=",
+								"_id": "AAAAAAF8rRxWTvDkvyU=",
 								"_parent": {
-									"$ref": "AAAAAAF8a09ISIt8mZw="
+									"$ref": "AAAAAAF8rRxWTfDic1E="
 								},
+								"name": "m_etudiants",
 								"reference": {
-									"$ref": "AAAAAAF8a08wl4tT4VE="
-								}
+									"$ref": "AAAAAAF8rRwMHfC1J28="
+								},
+								"visibility": "private",
+								"multiplicity": "*"
 							}
 						}
 					]
 				},
 				{
 					"_type": "UMLClass",
-					"_id": "AAAAAAF8a08wl4tT4VE=",
+					"_id": "AAAAAAF8rRwMHfC1J28=",
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Class2"
+					"name": "Etudiant"
 				}
 			]
 		}

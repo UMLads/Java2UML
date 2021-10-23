@@ -10,10 +10,10 @@ public class UMLToCode extends Translator {
     private String readLine = "nonull";
 
     public void addSpecs(UMLObject object) throws IOException {
-        readLine = reader.readLine();
+        readLine = this.getLine();
         object.setId(tidy(readLine));
-        reader.readLine();
-        readLine = reader.readLine();
+        this.getLine();
+        readLine = this.getLine();
         object.setParent(tidy(readLine));
     }
 
@@ -78,7 +78,7 @@ public class UMLToCode extends Translator {
     public UMLToCode() throws FileNotFoundException {
         super();
         classes = new ArrayList<>();
-        this.setFile("simple_class.mdj");
+        this.setFile("simple_association.mdj");
         this.initializeReader();
     }
 
@@ -148,8 +148,8 @@ public class UMLToCode extends Translator {
      */
     public void addParameters(UMLOperation umlOperation) throws IOException {
         UMLParameter umlParameter = new UMLParameter();
-        reader.readLine();
-        reader.readLine();
+        this.getLine();
+        this.getLine();
         addSpecs(umlParameter);
         while (true) {
             readLine = this.getReader().readLine();
@@ -218,19 +218,59 @@ public class UMLToCode extends Translator {
         }
     }
 
-    public UMLClass addAssociations(UMLClass umlClass) throws IOException {
-        UMLAssociation umlAssociation = new UMLAssociation();
+    public void addAssociations(UMLClass umlClass) throws IOException {
         while (true) {
             readLine = this.getReader().readLine();
-            if (readLine.contains("]")) return umlClass;
-            else if (readLine.contains("UMLAssociation")) {
-                //umlAssociation = this.addAssociationEnd(umlClass);
+            if (readLine.contains("]")) {
+                return;
+            } else if (readLine.contains("UMLAssociation")) {
+                addAssociation(umlClass);
             }
         }
     }
 
-    public void addAssociationEnd(UMLAssociation umlAssociation) {
-        return;
+    public void addAssociation(UMLClass umlClass) throws IOException {
+        UMLAssociation umlAssociation = new UMLAssociation();
+        addSpecs(umlAssociation);
+        while (true) {
+            readLine = this.getReader().readLine();
+            if (readLine.equals("\t\t\t\t\t\t}")) {
+                umlClass.addAssociation(umlAssociation);
+                return;
+            } else if (readLine.contains("\"name\"")) {
+                umlAssociation.setName(tidy(readLine));
+            } else if (readLine.contains("end1")) {
+                setAssociationEnd(umlAssociation, 1);
+            } else if (readLine.contains("end2")) {
+                setAssociationEnd(umlAssociation, 2);
+            }
+        }
+    }
+
+    public void setAssociationEnd(UMLAssociation umlAssociation, int end) throws IOException {
+        UMLAssociationEnd umlAssoEnd = new UMLAssociationEnd();
+        this.getLine();
+        addSpecs(umlAssoEnd);
+        while (true) {
+            readLine = this.getReader().readLine();
+            if (readLine.contains("\"reference\"")) {
+                readLine = this.getLine();
+                umlAssoEnd.setReference(tidy(readLine));
+            } else if (readLine.contains("\"name\"")) {
+                umlAssoEnd.setName(tidy(readLine));
+            } else if (readLine.contains("\"visibility\"")) {
+                umlAssoEnd.setVisibility(tidy(readLine));
+            } else if (readLine.contains("\"multiplicity\"")) {
+                umlAssoEnd.setMultiplicity(tidy(readLine));
+            } else if (readLine.equals("\t\t\t\t\t\t\t},") || readLine.equals("\t\t\t\t\t\t\t}")) {
+                if (end == 1) {
+                    umlAssociation.setEnd1(umlAssoEnd);
+                } else {
+                    umlAssociation.setEnd2(umlAssoEnd);
+                }
+                return;
+            }
+        }
     }
 
     public void addClass() throws IOException {

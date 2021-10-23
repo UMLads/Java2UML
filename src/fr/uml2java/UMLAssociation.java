@@ -3,19 +3,16 @@ package fr.uml2java;
 import java.util.ArrayList;
 
 public class UMLAssociation extends UMLObject {
-    private ArrayList<UMLAssociationEnd> associationEnds;
+    private UMLAssociationEnd end1;
+    private UMLAssociationEnd end2;
 
     @Override
     public String toString() {
-        String s = "";
-        for (UMLAssociationEnd umlAssociation : associationEnds) {
-            s += umlAssociation.toString();
-        }
-        return super.toString() + "\t with associations " + s;
-    }
-
-    public ArrayList<UMLAssociationEnd> getAssociationEnds() {
-        return associationEnds;
+        String s = super.toString();
+        s = s.substring(0, s.length() - 2) + " with ends : \n";
+        s += "\t\t\t" + end1.toString();
+        s += "\t\t\t" + end2.toString();
+        return s;
     }
 
     public String getName() {
@@ -30,10 +27,6 @@ public class UMLAssociation extends UMLObject {
         return super.getParent();
     }
 
-    public void setAssociationEnds(ArrayList<UMLAssociationEnd> associationEnds) {
-        this.associationEnds = associationEnds;
-    }
-
     public void setName(String name) {
         super.setName(name);
     }
@@ -44,5 +37,21 @@ public class UMLAssociation extends UMLObject {
 
     public void setParent(String parent) {
         super.setParent(parent);
+    }
+
+    public UMLAssociationEnd getEnd1() {
+        return end1;
+    }
+
+    public void setEnd1(UMLAssociationEnd end1) {
+        this.end1 = end1;
+    }
+
+    public UMLAssociationEnd getEnd2() {
+        return end2;
+    }
+
+    public void setEnd2(UMLAssociationEnd end2) {
+        this.end2 = end2;
     }
 }

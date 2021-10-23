@@ -3,8 +3,8 @@ package fr.uml2java;
 import java.io.*;
 
 public abstract class Translator {
-    File file;
-    BufferedReader reader;
+    private File file;
+    private BufferedReader reader;
 
     /**
      * // Translates the contents of a file
@@ -53,6 +53,10 @@ public abstract class Translator {
      */
     public void initializeReader() throws FileNotFoundException {
         this.reader = new BufferedReader(new FileReader(this.getFile()));
+    }
+
+    public String getLine() throws IOException {
+        return this.reader.readLine();
     }
 }
 

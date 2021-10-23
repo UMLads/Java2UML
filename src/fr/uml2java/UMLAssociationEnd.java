@@ -1,22 +1,20 @@
 package fr.uml2java;
 
-enum Visibility {
-    PRIVATE,
-    PUBLIC,
-    PROTECTED
-}
-
 public class UMLAssociationEnd extends UMLObject {
-    private Visibility visibility;
+    private String visibility = "public";
     private String multiplicity;
+    private String reference;
 
     @Override
     public String toString() {
-        return super.toString() + "\tis a : " + this.getClass().getSimpleName() + " with visibility : "
-                + visibility.toString() + "; with multiplicity : " + multiplicity + '\n';
+        String s = super.toString();
+        s = s.substring(0, s.length() - 2);
+        return  s + " with visibility : "
+                + visibility + "; with multiplicity : " + multiplicity
+                + "; pointing to class with id : " + reference + '\n';
     }
 
-    public Visibility getVisibility() {
+    public String getVisibility() {
         return visibility;
     }
 
@@ -36,7 +34,7 @@ public class UMLAssociationEnd extends UMLObject {
         return super.getParent();
     }
 
-    public void setVisibility(Visibility visibility) {
+    public void setVisibility(String visibility) {
         this.visibility = visibility;
     }
 
@@ -54,5 +52,13 @@ public class UMLAssociationEnd extends UMLObject {
 
     public void setParent(String parent) {
         super.setParent(parent);
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 }
