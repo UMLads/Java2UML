@@ -3,6 +3,7 @@ package fr.uml2java;
 import java.util.ArrayList;
 
 public class UMLClass extends UMLObject {
+    private boolean isAbstract = false;
     private ArrayList<UMLAttribute> attributes;
     private ArrayList<UMLOperation> operations;
     private ArrayList<UMLAssociation> associations;
@@ -10,7 +11,7 @@ public class UMLClass extends UMLObject {
     @Override
     public String toString() {
         String s = super.toString();
-        s = s.substring(0, s.length()-2) + " contains :\n";
+        s = s.substring(0, s.length()-2) + ((isAbstract) ? " isAbstract;" : "") + " contains :\n";
         s += "\tattributes : \n";
         for (UMLAttribute umlAttribute : attributes) {
             s += "\t\t" + umlAttribute.toString();
@@ -95,5 +96,13 @@ public class UMLClass extends UMLObject {
 
     public UMLAttribute getLastAtt() {
         return attributes.get(attributes.size() - 1);
+    }
+
+    public boolean isAbstract() {
+        return isAbstract;
+    }
+
+    public void setAbstract() {
+        isAbstract = true;
     }
 }

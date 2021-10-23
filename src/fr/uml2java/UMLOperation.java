@@ -5,6 +5,7 @@ import java.util.List;
 
 public class UMLOperation extends UMLObject {
     private List<UMLParameter> umlParameters;
+    private boolean isAbstract = false;
 
     public UMLOperation() {
         umlParameters = new ArrayList<>();
@@ -13,7 +14,7 @@ public class UMLOperation extends UMLObject {
     @Override
     public String toString() {
         String s = super.toString();
-        s = s.substring(0, s.length()-2) + " with parameters :\n";
+        s = s.substring(0, s.length()-2) + ((isAbstract) ? " isAbstract;" : "") + " with parameters :\n";
         for (UMLParameter umlParameter : umlParameters) {
             s += "\t\t\t" + umlParameter.toString();
         }
@@ -54,5 +55,13 @@ public class UMLOperation extends UMLObject {
 
     public void setParent(String parent) {
         super.setParent(parent);
+    }
+
+    public boolean isAbstract() {
+        return isAbstract;
+    }
+
+    public void setAbstract() {
+        isAbstract = true;
     }
 }

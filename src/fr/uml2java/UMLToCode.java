@@ -78,7 +78,7 @@ public class UMLToCode extends Translator {
     public UMLToCode() throws FileNotFoundException {
         super();
         classes = new ArrayList<>();
-        this.setFile("simple_association.mdj");
+        this.setFile("abstractClass.mdj");
         this.initializeReader();
     }
 
@@ -125,8 +125,12 @@ public class UMLToCode extends Translator {
             readLine = this.getReader().readLine();
             if (readLine.contains("\"type\"")) {
                 attribute.setType(tidy(readLine));
-            } else if (readLine.contains("name")) {
+            } else if (readLine.contains("\"name\"")) {
                 attribute.setName(tidy(readLine));
+            } else if (readLine.contains("\"isDerived\"")) {
+                attribute.setDerived();
+            } else if (readLine.contains("\"isStatic\"")) {
+                attribute.setStatic();
             } else if (readLine.equals("\t\t\t\t\t\t}") || readLine.equals("\t\t\t\t\t\t},")) {
                 umlClass.addAttribute(attribute);
                 return;
@@ -188,6 +192,12 @@ public class UMLToCode extends Translator {
             readLine = this.getReader().readLine();
             if (readLine.contains("name")) {
                 umlOperation.setName(tidy(readLine));
+            } else if (readLine.contains("\"isAbstract\"")) {
+                umlOperation.setAbstract();
+            } else if (readLine.contains("\"isDerived\"")) {
+                umlOperation.setDerived();
+            } else if (readLine.contains("\"isStatic\"")) {
+                umlClass.setStatic();
             } else if (readLine.contains("parameters")) {
                 addParameters(umlOperation);
             } else if (readLine.equals("\t\t\t\t\t\t}") || readLine.equals("\t\t\t\t\t\t},")) {
@@ -281,6 +291,10 @@ public class UMLToCode extends Translator {
             if (readLine.contains("name")) {
                 readLine = this.tidy(readLine);
                 umlClass.setName(readLine);
+            } else if (readLine.contains("\"isAbstract\"")) {
+                umlClass.setAbstract();
+            } else if (readLine.contains("\"isStatic\"")) {
+                umlClass.setStatic();
             } else if (readLine.contains("attributes")) {
                 addAttributes(umlClass);
             } else if (readLine.contains("operations")) {
