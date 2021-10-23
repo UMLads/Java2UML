@@ -7,7 +7,15 @@ import java.util.List;
 
 public class UMLToCode extends Translator {
     private List<UMLClass> classes;
+    private String readLine = "nonull";
 
+    public void addSpecs(UMLObject object) throws IOException {
+        readLine = reader.readLine();
+        object.setId(tidy(readLine));
+        reader.readLine();
+        readLine = reader.readLine();
+        object.setParent(tidy(readLine));
+    }
 
     /**
      * @return list of UMLClasses of the class
@@ -22,7 +30,6 @@ public class UMLToCode extends Translator {
     public void setClasses(List<UMLClass> classes) {
         this.classes = classes;
     }
-
 
     /**
      * This method requires to be called after the file was searched
@@ -39,7 +46,6 @@ public class UMLToCode extends Translator {
         }
         return s.toString();
     }
-
 
     /**
      * This methods returns the important information from a string which was built based on the line the reader read
@@ -66,7 +72,6 @@ public class UMLToCode extends Translator {
         return r;
     }
 
-
     /**
      * //TODO
      */
@@ -92,16 +97,14 @@ public class UMLToCode extends Translator {
      * If it sees the keywords "]" is return the class with all the attributes added if there was any to add
      *
      * @param umlClass UMLClass to add the attributes to its list of attributes
-     * @return the class once all the attributes were added
      * @throws IOException throws IOException if the there's an issue with the file being read
      */
-    public UMLClass addAttributes(UMLClass umlClass) throws IOException {
-        String s;
+    public void addAttributes(UMLClass umlClass) throws IOException {
         while (true) {
-            s = this.getReader().readLine();
-            if (s.contains("]")) return umlClass;
-            else if (s.contains("UMLAttribute")) {
-                umlClass = this.addAttribute(umlClass);
+            readLine = this.getReader().readLine();
+            if (readLine.contains("]")) return;
+            else if (readLine.contains("UMLAttribute")) {
+                addAttribute(umlClass);
             }
         }
     }
@@ -113,25 +116,20 @@ public class UMLToCode extends Translator {
      * UMLAttribute. The method then returns the UMLClass with the attribute list updated with a new attribute
      *
      * @param umlClass Class to add an attribute to
-     * @return the umlClass in parameters with an attribute added to its list of attributes
      * @throws IOException throws IOException if the there's an issue with the file being read
      */
-    public UMLClass addAttribute(UMLClass umlClass) throws IOException {
-        String s;
+    public void addAttribute(UMLClass umlClass) throws IOException {
         UMLAttribute attribute = new UMLAttribute();
+        addSpecs(attribute);
         while (true) {
-            s = this.getReader().readLine();
-            if (s.contains("\"type\"")) {
-                attribute.setType(tidy(s));
-            } else if (s.contains("$ref")) {
-                attribute.setParent(tidy(s));
-            } else if (s.contains("name")) {
-                attribute.setName(tidy(s));
-            } else if (s.contains("_id")) {
-                attribute.setId(tidy(s));
-            } else if (s.equals("\t\t\t\t\t\t}") || s.equals("\t\t\t\t\t\t},")) {
-                umlClass.getAttributes().add(attribute);
-                return umlClass;
+            readLine = this.getReader().readLine();
+            if (readLine.contains("\"type\"")) {
+                attribute.setType(tidy(readLine));
+            } else if (readLine.contains("name")) {
+                attribute.setName(tidy(readLine));
+            } else if (readLine.equals("\t\t\t\t\t\t}") || readLine.equals("\t\t\t\t\t\t},")) {
+                umlClass.addAttribute(attribute);
+                return;
             }
         }
     }
@@ -146,33 +144,31 @@ public class UMLToCode extends Translator {
      * If it sees the keywords "]" is return the UMLOperation with all the UMLParameters added if there was any to add
      *
      * @param umlOperation umlOperation to add the UMLParameters to
-     * @return returns umlOperation once all the UMLParameters were added
      * @throws IOException throws IOException if the there's an issue with the file being read
      */
-    public UMLOperation addParameters(UMLOperation umlOperation) throws IOException {
-        String s;
+    public void addParameters(UMLOperation umlOperation) throws IOException {
         UMLParameter umlParameter = new UMLParameter();
+        reader.readLine();
+        reader.readLine();
+        addSpecs(umlParameter);
         while (true) {
-            s = this.getReader().readLine();
-            if (s.contains("\"type\"")) {
-                umlParameter.setType(tidy(s));
-            } else if (s.contains("_id")) {
-                umlParameter.setId(tidy(s));
-            } else if (s.contains("$ref")) {
-                umlParameter.setParent(tidy(s));
-            } else if (s.contains("direction")) {
+            readLine = this.getReader().readLine();
+            if (readLine.contains("\"type\"")) {
+                umlParameter.setType(tidy(readLine));
+            } else if (readLine.contains("direction")) {
                 umlParameter.setReturn(Boolean.TRUE);
-            } else if (s.equals("\t\t\t\t\t\t\t\t}")) {
-                umlOperation.getUmlParameters().add(umlParameter);
-                return umlOperation;
-            } else if (s.equals("\t\t\t\t\t\t\t\t},")) {
-                umlOperation.getUmlParameters().add(umlParameter);
-                umlOperation = addParameters(umlOperation);
-                return umlOperation;
+            } else if (readLine.contains("\"name\"")) {
+                umlParameter.setName(tidy(readLine));
+            } else if (readLine.equals("\t\t\t\t\t\t\t\t}")) {
+                umlOperation.addParameter(umlParameter);
+                return;
+            } else if (readLine.equals("\t\t\t\t\t\t\t\t},")) {
+                umlOperation.addParameter(umlParameter);
+                addParameters(umlOperation);
+                return;
             }
         }
     }
-
 
     /**
      * This function is called by addOperations() everytime the keyword "UMLOperation" is found
@@ -183,25 +179,20 @@ public class UMLToCode extends Translator {
      * as a parameter to add the UMLParameters to the operation.
      *
      * @param umlClass class to add the operation to
-     * @return umlClass after it's been updated with a new operation
      * @throws IOException throws IOException if the there's an issue with the file being read
      */
-    public UMLClass addOperation(UMLClass umlClass) throws IOException {
-        String s;
+    public void addOperation(UMLClass umlClass) throws IOException {
         UMLOperation umlOperation = new UMLOperation();
+        addSpecs(umlOperation);
         while (true) {
-            s = this.getReader().readLine();
-            if (s.contains("$ref")) {
-                umlOperation.setParent(tidy(s));
-            } else if (s.contains("name")) {
-                umlOperation.setName(tidy(s));
-            } else if (s.contains("_id")) {
-                umlOperation.setId(tidy(s));
-            } else if (s.contains("parameters")) {
-                umlOperation = addParameters(umlOperation);
-            } else if (s.equals("\t\t\t\t\t\t}") || s.equals("\t\t\t\t\t\t},")) {
-                umlClass.getOperations().add(umlOperation);
-                return umlClass;
+            readLine = this.getReader().readLine();
+            if (readLine.contains("name")) {
+                umlOperation.setName(tidy(readLine));
+            } else if (readLine.contains("parameters")) {
+                addParameters(umlOperation);
+            } else if (readLine.equals("\t\t\t\t\t\t}") || readLine.equals("\t\t\t\t\t\t},")) {
+                umlClass.addOperation(umlOperation);
+                return;
             }
         }
     }
@@ -215,57 +206,48 @@ public class UMLToCode extends Translator {
      * If it sees the keywords "]" is return the class with all the operations added if there was any to add
      *
      * @param umlClass class to add the operations to
-     * @return class updated with all the operations if there was any
      * @throws IOException throws IOException if the there's an issue with the file being read
      */
-    public UMLClass addOperations(UMLClass umlClass) throws IOException {
-        String s;
+    public void addOperations(UMLClass umlClass) throws IOException {
         while (true) {
-            s = this.getReader().readLine();
-            if (s.contains("]")) return umlClass;
-            else if (s.contains("UMLOperation")) {
-                umlClass = this.addOperation(umlClass);
+            readLine = this.getReader().readLine();
+            if (readLine.contains("]")) return;
+            else if (readLine.contains("UMLOperation")) {
+                addOperation(umlClass);
             }
         }
     }
 
     public UMLClass addAssociations(UMLClass umlClass) throws IOException {
-        String s;
         UMLAssociation umlAssociation = new UMLAssociation();
         while (true) {
-            s = this.getReader().readLine();
-            if (s.contains("]")) return umlClass;
-            else if (s.contains("UMLAssociation")) {
+            readLine = this.getReader().readLine();
+            if (readLine.contains("]")) return umlClass;
+            else if (readLine.contains("UMLAssociation")) {
                 //umlAssociation = this.addAssociationEnd(umlClass);
             }
         }
     }
 
-    public UMLAssociation addAssociationEnd(UMLAssociation umlAssociation) {
-        return null;
+    public void addAssociationEnd(UMLAssociation umlAssociation) {
+        return;
     }
 
     public void addClass() throws IOException {
-        String s = "prou";
         UMLClass umlClass = new UMLClass();
+        addSpecs(umlClass);
         while (true) {
-            s = this.getReader().readLine();
-            if (s.contains("_id")) {
-                s = this.tidy(s);
-                umlClass.setId(s);
-            } else if (s.contains("$ref")) {
-                s = this.tidy(s);
-                umlClass.setParent(s);
-            } else if (s.contains("name")) {
-                s = this.tidy(s);
-                umlClass.setName(s);
-            } else if (s.contains("attributes")) {
-                umlClass = this.addAttributes(umlClass);
-            } else if (s.contains("operations")) {
-                umlClass = this.addOperations(umlClass);
-            } else if (s.contains("ownedElements")) {
-                umlClass = this.addAssociations(umlClass);
-            } else if (s.equals("\t\t\t\t},") || s.equals("\t\t\t\t}")) {
+            readLine = this.getReader().readLine();
+            if (readLine.contains("name")) {
+                readLine = this.tidy(readLine);
+                umlClass.setName(readLine);
+            } else if (readLine.contains("attributes")) {
+                addAttributes(umlClass);
+            } else if (readLine.contains("operations")) {
+                addOperations(umlClass);
+            } else if (readLine.contains("ownedElements")) {
+                addAssociations(umlClass);
+            } else if (readLine.equals("\t\t\t\t},") || readLine.equals("\t\t\t\t}")) {
                 this.classes.add(umlClass);
                 return;
             }
@@ -273,12 +255,11 @@ public class UMLToCode extends Translator {
     }
 
     public void extractInformation() throws IOException {
-        String s = "prou";
-        while (s != null) {
-            if (s.contains("\"UMLClass\"")) {
+        while (readLine != null) {
+            if (readLine.contains("\"UMLClass\"")) {
                 this.addClass();
             }
-            s = this.getReader().readLine();
+            readLine = this.getReader().readLine();
         }
     }
 

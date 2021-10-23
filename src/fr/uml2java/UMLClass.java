@@ -11,14 +11,17 @@ public class UMLClass extends UMLObject {
     public String toString() {
         String s = super.toString();
         s = s.substring(0, s.length()-2) + " contains :\n";
+        s += "\tattributes : \n";
         for (UMLAttribute umlAttribute : attributes) {
-            s += '\t' + umlAttribute.toString();
+            s += "\t\t" + umlAttribute.toString();
         }
+        s += "\toprations : \n";
         for (UMLOperation umlOperation : operations) {
-            s += '\t' + umlOperation.toString();
+            s += "\t\t" + umlOperation.toString();
         }
+        s += "\towned elements : \n";
         for (UMLAssociation umlAssociation : associations) {
-            s += '\t' + umlAssociation.toString();
+            s += "\t\t" + umlAssociation.toString();
         }
         return s;
     }
@@ -62,10 +65,6 @@ public class UMLClass extends UMLObject {
         return super.getId();
     }
 
-    public String getReference() {
-        return super.getReference();
-    }
-
     public String getParent() {
         return super.getParent();
     }
@@ -78,11 +77,23 @@ public class UMLClass extends UMLObject {
         super.setId(id);
     }
 
-    public void setReference(String reference) {
-        super.setReference(reference);
-    }
-
     public void setParent(String parent) {
          super.setParent(parent);
+    }
+
+    public void addAttribute(UMLAttribute umlAttribute) {
+        attributes.add(umlAttribute);
+    }
+
+    public void addOperation(UMLOperation umlOperation) {
+        operations.add(umlOperation);
+    }
+
+    public void addAssociation(UMLAssociation umlAssociation) {
+        associations.add(umlAssociation);
+    }
+
+    public UMLAttribute getLastAtt() {
+        return attributes.get(attributes.size() - 1);
     }
 }

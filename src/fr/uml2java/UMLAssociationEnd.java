@@ -32,10 +32,6 @@ public class UMLAssociationEnd extends UMLObject {
         return super.getId();
     }
 
-    public String getReference() {
-        return super.getReference();
-    }
-
     public String getParent() {
         return super.getParent();
     }
@@ -54,10 +50,6 @@ public class UMLAssociationEnd extends UMLObject {
 
     public void setId(String id) {
         super.setId(id);
-    }
-
-    public void setReference(String reference) {
-        super.setReference(reference);
     }
 
     public void setParent(String parent) {

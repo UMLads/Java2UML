@@ -15,9 +15,13 @@ public class UMLOperation extends UMLObject {
         String s = super.toString();
         s = s.substring(0, s.length()-2) + " with parameters :\n";
         for (UMLParameter umlParameter : umlParameters) {
-            s += "\t\t" + umlParameter.toString();
+            s += "\t\t\t" + umlParameter.toString();
         }
         return s;
+    }
+
+    public void addParameter(UMLParameter umlParameter) {
+        umlParameters.add(umlParameter);
     }
 
     public List<UMLParameter> getUmlParameters() {
@@ -36,10 +40,6 @@ public class UMLOperation extends UMLObject {
         return super.getId();
     }
 
-    public String getReference() {
-        return super.getReference();
-    }
-
     public String getParent() {
         return super.getParent();
     }
@@ -50,10 +50,6 @@ public class UMLOperation extends UMLObject {
 
     public void setId(String id) {
         super.setId(id);
-    }
-
-    public void setReference(String reference) {
-        super.setReference(reference);
     }
 
     public void setParent(String parent) {
