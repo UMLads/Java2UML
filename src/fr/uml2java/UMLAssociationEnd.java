@@ -4,8 +4,13 @@ public class UMLAssociationEnd extends UMLObject {
     private String visibility = "public";
     private String multiplicity;
     private String reference;
+    private String associatedClassId;
+    private String aggregationType;
 
-    @Override
+
+
+
+	@Override
     public String toString() {
         String s = super.toString();
         s = s.substring(0, s.length() - 2);
@@ -14,6 +19,22 @@ public class UMLAssociationEnd extends UMLObject {
                 + "; pointing to class with id : " + reference + '\n';
     }
 
+    public String getAggregationType() {
+		return aggregationType;
+	}
+
+	public void setAggregationType(String aggregationType) {
+		this.aggregationType = aggregationType;
+	}
+	
+    public String getAssociatedClassId() {
+		return associatedClassId;
+	}
+
+	public void setAssociatedClassId(String associatedClassId) {
+		this.associatedClassId = associatedClassId;
+	}
+	
     public String getVisibility() {
         return visibility;
     }

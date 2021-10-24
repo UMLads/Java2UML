@@ -6,7 +6,7 @@ public class UMLAssociation extends UMLObject {
     private UMLAssociationEnd end1;
     private UMLAssociationEnd end2;
 
-    @Override
+	@Override
     public String toString() {
         String s = super.toString();
         s = s.substring(0, s.length() - 2) + " with ends : \n";

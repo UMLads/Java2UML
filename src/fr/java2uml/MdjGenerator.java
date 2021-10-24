@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import fr.uml2java.*;
+import fr.java2uml.JavaAnalyser;
 
 public class MdjGenerator {
 	
@@ -13,7 +14,7 @@ public class MdjGenerator {
 	
 	private String allUMLClass = "";
 	private String allUMLClassView = "";
-	private String UMLAssociationView = "";
+	private String allUMLAssociationView = "";
 	
 	private String UMLClassViewBase = 
 			"						{\r\n"
@@ -48,7 +49,7 @@ public class MdjGenerator {
 			+ "								\"$ref\": \"MyClass1View_id\"\r\n"
 			+ "							},\r\n"
 			+ "							\"lineStyle\": 1,\r\n"
-			+ "							\"points\": \"points_coordinates\",\r\n"
+			+ "							\"points\": \"178:325;248:423\",\r\n"
 			+ "							\"showVisibility\": true\r\n"
 			+ "						}";
 	private String UMLClassBase = "{\r\n"
@@ -97,7 +98,7 @@ public class MdjGenerator {
 			+ "									\"name\": \"UMLParameter_name\",\r\n"
 			+ "									\"type\": \"UMLParameter_type\"\r\n"
 			+ "								}";
-	private String UMLAssocationBase = "{\r\n"
+	private String UMLAssociationBase = "{\r\n"
 			+ "							\"_type\": \"UMLAssociation\",\r\n"
 			+ "							\"_id\": \"association_id\",\r\n"
 			+ "							\"_parent\": {\r\n"
@@ -124,7 +125,9 @@ public class MdjGenerator {
 			+ "								\"name\": \"linkAttribute2_name\",\r\n"
 			+ "								\"reference\": {\r\n"
 			+ "									\"$ref\": \"MyClass2_id\"\r\n"
-			+ "								}\r\n"
+			+ "								},\r\n"
+			+ "								\"aggregation\": \"end_2_myAggregationType\",\r\n"
+			+ "								\"multiplicity\": \"end_2_myMultiplicity\""
 			+ "							}\r\n"
 			+ "						}";
 	
@@ -134,16 +137,15 @@ public class MdjGenerator {
 	public void generateClasses(UMLDiagram diagram) {
 		for(UMLClass c : diagram.getMyClasses()) {
 			String newUMLClass = UMLClassBase;
-			
 			newUMLClass = newUMLClass.replace("MyClass_id", c.getId());
 			newUMLClass = newUMLClass.replace("MyClass_name", c.getName());
 
 			String allUMLAttributes = "";
 			for(UMLAttribute v : c.getAttributes()) {
 				String UMLAttribute = UMLAttributeBase;
-				UMLAttribute = UMLAttribute.replace("UMLAttribute_id",  Integer.toString(v.getId()));
+				UMLAttribute = UMLAttribute.replace("UMLAttribute_id",  v.getId());
 				UMLAttribute =UMLAttribute.replace("myAttribute_name",  v.getName());
-				UMLAttribute = UMLAttribute.replace("MyClass_id", Integer.toString(v.getMyClassId()));
+				UMLAttribute = UMLAttribute.replace("MyClass_id", v.getMyClassId());
 				allUMLAttributes += UMLAttribute + ",";
 			}
 			if(c.getAttributes().size() > 0)
@@ -162,7 +164,7 @@ public class MdjGenerator {
 					UMLParameter = UMLParameter.replace("UMLParameter_id",  v.getId());
 					UMLParameter = UMLParameter.replace("UMLParameter_name",  v.getName());
 					UMLParameter = UMLParameter.replace("UMLOperation_id", v.getMyOperationId());
-					UMLParameter  = UMLParameter.replace("UMLOperation_type", v.getType());
+					UMLParameter  = UMLParameter.replace("UMLParameter_type", v.getType());
 					UMLParameters += UMLParameter + ",";
 				}
 				if(o.getUmlParameters().size() > 0)
@@ -174,14 +176,55 @@ public class MdjGenerator {
 			allUMLOperations = allUMLOperations.substring(0, allUMLOperations.length() - 1);
 			newUMLClass = newUMLClass.replace("REPLACE_OPERATIONS", allUMLOperations);
 
+			String allUMLAssociations = "";
+			for(UMLAssociation a : c.getAssociations()) {
+				String UMLAssociation = UMLAssociationBase;
+				UMLAssociation = UMLAssociation.replaceAll("association_id", a.getId());
+				UMLAssociation = UMLAssociation.replaceAll("MyClass_id", c.getId());
+				UMLAssociation = UMLAssociation.replace("association_name", a.getName());
+				UMLAssociation = UMLAssociation.replace("UMLAssociationEnd1_id", a.getEnd1().getId());
+				UMLAssociation = UMLAssociation.replace("linkAttribute1_name", a.getEnd1().getName());
+				UMLAssociation = UMLAssociation.replace("UMLAssociationEnd2_id", a.getEnd2().getId());
+				UMLAssociation = UMLAssociation.replace("linkAttribute2_name", a.getEnd2().getName());
+				UMLAssociation = UMLAssociation.replace("MyClass2_id", a.getEnd2().getAssociatedClassId());
+				UMLAssociation = UMLAssociation.replace("end_2_myAggregationType", a.getEnd2().getAggregationType());
+				UMLAssociation = UMLAssociation.replace("end_2_myMultiplicity", a.getEnd2().getMultiplicity());
+
+				allUMLAssociations += UMLAssociation + ",";
+			}
+			if(c.getAssociations().size() > 0)
+			allUMLAssociations = allUMLAssociations.substring(0, allUMLAssociations.length() - 1);
+			newUMLClass = newUMLClass.replace("REPLACE_ASSOCIATIONS", allUMLAssociations);
+			
 			System.out.println(newUMLClass);
 			UMLClassList.add(newUMLClass);
 		}
 	}
 	
+	public void generateViews(UMLDiagram diagram) {
+		for(UMLClass c : diagram.getMyClasses()) {
+			String newUMLClassView = UMLClassViewBase;
+			
+			newUMLClassView = newUMLClassView.replace("MyClass1View_id", (c.getId() + "view") );
+			newUMLClassView = newUMLClassView.replace("MyClass_id", c.getId());
+			UMLClassViewList.add(newUMLClassView);
+			for(UMLAssociation a : c.getAssociations()) {
+				String newUMLAssociationView = UMLAssociationViewBase;
+				newUMLAssociationView = newUMLAssociationView.replace("associationView_id", Integer.toString(++JavaAnalyser.uniqueID));
+				newUMLAssociationView = newUMLAssociationView.replace("association_id", a.getId());
+				newUMLAssociationView = newUMLAssociationView.replace("MyClass2View_id", a.getEnd2().getAssociatedClassId()+"view");
+				newUMLAssociationView = newUMLAssociationView.replace("MyClass1View_id", a.getEnd1().getAssociatedClassId()+"view");
+				UMLAssociationViewList.add(newUMLAssociationView);
+			}
+			
+		}
+		
+	}
+	
 	public void generateData(UMLDiagram diagram) {
 		
 		generateClasses(diagram);
+		generateViews(diagram);
 		
 		for(String s : UMLClassList) {
 			allUMLClass += (s + ",");
@@ -192,15 +235,14 @@ public class MdjGenerator {
 		for(String s : UMLClassViewList) {
 			allUMLClassView += (s + ",");
 		}
-		if(UMLClassViewList.size() > 0 && UMLClassViewList.size() == 0)
-		allUMLClassView = allUMLClassView.substring(0, allUMLClassView.length() - 1);
-		
-		
+		if(UMLClassViewList.size() > 0 && UMLAssociationViewList.size() == 0)
+			allUMLClassView = allUMLClassView.substring(0, allUMLClassView.length() - 1);
+
 		for(String s : UMLAssociationViewList) {
-			UMLAssociationView += (s + ",");
+			allUMLAssociationView += (s + ",");
 		}
 		if(UMLAssociationViewList.size() > 0)
-		UMLAssociationView = UMLAssociationView.substring(0, UMLAssociationView.length() - 1);
+		allUMLAssociationView = allUMLAssociationView.substring(0, allUMLAssociationView.length() - 1);
 
 		data =
 				"{\r\n"
@@ -225,7 +267,7 @@ public class MdjGenerator {
 						+ "					\"name\": \"MyDiagram\",\r\n"
 						+ "					\"defaultDiagram\": true,\r\n"
 						+ "					\"ownedViews\": [\r\n"
-						+ allUMLClassView + allUMLClassView
+						+ allUMLClassView + allUMLAssociationView
 						+ "					]\r\n"
 						+ "				},\r\n"
 						+ allUMLClass
@@ -252,6 +294,9 @@ public class MdjGenerator {
 			FileWriter writer = new FileWriter(path+"/Diagram.mdj");
 			writer.write(data);
 			writer.close();
+			FileWriter writer2 = new FileWriter(path+"/Diagram.json");
+			writer2.write(data);
+			writer2.close();
 
 		} catch (IOException e) {
 			System.out.println("Erreur.");

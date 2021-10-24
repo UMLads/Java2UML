@@ -15,6 +15,13 @@ public class UMLDiagram {
 		this.myClasses = myClasses;
 	}
 	
-
+	public UMLClass getClassWithName(String className) {
+		for(UMLClass c : getMyClasses()) {
+			if(c.getName().equals(className)) {
+				return c;
+			}
+		}
+		return null;
+	}
 
 }

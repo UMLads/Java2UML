@@ -7,9 +7,9 @@ import fr.uml2java.*;
 
 public class JavaAnalyser {
 
-	private int uniqueID;
+	public static int uniqueID;
 	
-	private File folder = new File("C:/Users/mathy/OneDrive/Documents/PTUT/FolderToAnalyse");
+	private File folder = new File("C:/Users/Mathys Garoui/Documents/PTUT/FolderToAnalyse");
 	private List<File> files = new ArrayList<>();
 
 	public JavaAnalyser() {}
@@ -184,12 +184,14 @@ public class JavaAnalyser {
 				String line = reader.readLine();
 				if(line.contains("class ")){
 					//ligne qui contient la déclaration de la classe
-					int indexOfStartClass = 6;
+					int indexOfStartClass = line.indexOf("class ") + 6;
 					String className = "";
 					for(int i = indexOfStartClass; i <= line.length()-1 && Character.isLetter(line.charAt(i)); i++) { //+7 permet d'obtenir l'index de la premiere lettre du nom de la classe
 						className += line.charAt(i);
 					}
-					newClass.setName(className);			     }
+					System.out.println("class : " + className);
+					newClass.setName(className);
+				}
 				else if((line.contains("private") || line.contains("public")) && line.contains(";")) {
 					//Ligne qui contient la déclaration d'une variable
 					attributesAnalysis(line, newClass);
@@ -198,7 +200,6 @@ public class JavaAnalyser {
 				else if((line.contains("private") || line.contains("public")) && line.contains("(")) {
 					//Ligne qui contient la déclaration d'une d'une fonction
 					operationAnalysis(line, newClass);
-
 				}
 			}
 			
@@ -207,19 +208,53 @@ public class JavaAnalyser {
 			newDiagram.setMyClasses(newClasses) ;
 		}
 		
-		
+		detectAssociations(newDiagram);
 		return newDiagram;
+	}
+	
+
+	
+	public void detectAssociations(UMLDiagram diagram) {
+		for(UMLClass c : diagram.getMyClasses()) {
+			for(UMLAttribute a : c.getAttributes()) {
+				if(diagram.getClassWithName(a.getType()) != null) {
+					UMLAssociation newAssociation = new UMLAssociation();
+					newAssociation.setId(Integer.toString(++uniqueID));
+					newAssociation.setName("Est compose de");
+					UMLAssociationEnd end1 = new UMLAssociationEnd();
+					UMLAssociationEnd end2 = new UMLAssociationEnd();
+					end1.setId(Integer.toString(++uniqueID));
+					end1.setAssociatedClassId(c.getId());
+					end1.setName("");
+					end1.setAggregationType("none");
+					end1.setMultiplicity("");
+					end2.setId(Integer.toString(++uniqueID));
+					end2.setAssociatedClassId(diagram.getClassWithName(a.getType()).getId());
+					end2.setName("my"+a.getName());
+					end2.setAggregationType("shared");
+					end2.setMultiplicity("1");
+					if(a.getType().contains("[]") || (a.getType().contains("<") && a.getType().contains(">"))) {
+						end2.setMultiplicity("*");
+						end2.setName(end2.getName() + "s");
+					}
+					
+					
+					newAssociation.setEnd1(end1);
+					newAssociation.setEnd2(end2);
+					c.addAssociation(newAssociation);
+				}
+			}
+		}
 	}
 	
 	public void generateJsonFile(UMLDiagram diagram) {
 		MdjGenerator j = new MdjGenerator();
-		j.generateJsonFileFromDiagram("C:/Users/mathy/OneDrive/Documents/PTUT/JsonGeneration", diagram);
+		j.generateJsonFileFromDiagram("C:/Users/Mathys Garoui/Documents/PTUT/JsonGeneration", diagram);
 	}
 
 	public void startAnalyse() throws IOException {
 		listFilesForFolder(folder);
 		UMLDiagram d = analyseFiles();
-		generateJsonFile(d);
 		String indent = "";
 		for(UMLClass c : d.getMyClasses()) {
 			indent = "Class : ";
@@ -239,6 +274,8 @@ public class JavaAnalyser {
 				}
 			}
 		}
+		generateJsonFile(d);
+
 	}
 	
 	

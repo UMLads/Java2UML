@@ -1,11 +1,12 @@
 package fr.uml2java;
 
 import java.io.FileNotFoundException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ptut.JavaAnalyser;
+import fr.java2uml.*;
 
 public class Main {
 	/*
