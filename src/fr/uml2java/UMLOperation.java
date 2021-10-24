@@ -6,8 +6,19 @@ import java.util.List;
 public class UMLOperation extends UMLObject {
     private List<UMLParameter> umlParameters;
     private boolean isAbstract = false;
+    private String myClassId;
+    private String returnType;
+    
+    
+    public String getReturnType() {
+		return returnType;
+	}
 
-    public UMLOperation() {
+	public void setReturnType(String returnType) {
+		this.returnType = returnType;
+	}
+
+	public UMLOperation() {
         umlParameters = new ArrayList<>();
     }
 
@@ -24,7 +35,15 @@ public class UMLOperation extends UMLObject {
     public void addParameter(UMLParameter umlParameter) {
         umlParameters.add(umlParameter);
     }
+    
+    public String getMyClassId() {
+    	return myClassId;
+    }
 
+    public void setMyClassId(String myClassId) {
+    	this.myClassId = myClassId;
+    }
+    
     public List<UMLParameter> getUmlParameters() {
         return umlParameters;
     }

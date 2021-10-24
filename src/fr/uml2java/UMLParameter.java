@@ -2,8 +2,10 @@ package fr.uml2java;
 
 public class UMLParameter extends UMLAttribute {
     boolean isReturn;
-
-    @Override
+    private String myOperationId;
+   
+    
+	@Override
     public String toString() {
         String s = super.toString();
         s = s.substring(0, s.length() - 1);
@@ -17,6 +19,15 @@ public class UMLParameter extends UMLAttribute {
     public void setReturn(boolean isReturn) {
         this.isReturn = isReturn;
     }
+    
+    public String getMyOperationId() {
+		return myOperationId;
+	}
+
+	public void setMyOperationId(String myOperationId) {
+		this.myOperationId = myOperationId;
+	}
+
 
     public String getType() {
         return super.getType();

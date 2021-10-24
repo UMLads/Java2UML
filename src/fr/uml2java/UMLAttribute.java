@@ -2,6 +2,7 @@ package fr.uml2java;
 
 public class UMLAttribute extends UMLObject {
     private String type;
+    private String myClassId;
 
     @Override
     public String toString() {
@@ -14,6 +15,14 @@ public class UMLAttribute extends UMLObject {
         super();
     }
 
+    public String getMyClassId() {
+    	return myClassId;
+    }
+
+    public void setMyClassId(String myClassId) {
+    	this.myClassId = myClassId;
+    }
+    
     public String getType() {
         return type;
     }
