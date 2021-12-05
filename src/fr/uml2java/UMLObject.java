@@ -3,9 +3,9 @@ package fr.uml2java;
 import java.util.ArrayList;
 
 public class UMLObject {
-    private String name;
-    private String id;
-    private String parent;
+    private String name = "";
+    private String id = "";
+    private String parent = "";
     private boolean derived;
     private boolean _static;
 

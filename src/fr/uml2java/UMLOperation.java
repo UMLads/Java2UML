@@ -6,11 +6,24 @@ import java.util.List;
 public class UMLOperation extends UMLObject {
     private List<UMLParameter> umlParameters;
     private boolean isAbstract = false;
+    private boolean isStatic = false;
+
     private String myClassId;
     private String returnType;
+    private String visibility;
+    
+
     
     
-    public String getReturnType() {
+    public String getVisibility() {
+		return visibility;
+	}
+
+	public void setVisibility(String visibility) {
+		this.visibility = visibility;
+	}
+
+	public String getReturnType() {
 		return returnType;
 	}
 
@@ -83,4 +96,12 @@ public class UMLOperation extends UMLObject {
     public void setAbstract() {
         isAbstract = true;
     }
+
+	public boolean isStatic() {
+		return isStatic;
+	}
+
+	public void setStatic(boolean isStatic) {
+		this.isStatic = isStatic;
+	}
 }

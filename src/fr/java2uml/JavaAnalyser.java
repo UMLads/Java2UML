@@ -1,19 +1,29 @@
 package fr.java2uml;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
-import fr.uml2java.*;
+import fr.uml2java.UMLAssociation;
+import fr.uml2java.UMLAssociationEnd;
+import fr.uml2java.UMLAttribute;
+import fr.uml2java.UMLClass;
+import fr.uml2java.UMLOperation;
+import fr.uml2java.UMLParameter;
 
 public class JavaAnalyser {
 
 	public static int uniqueID;
-	
+
 	private File folder = new File("C:/Users/Mathys Garoui/Documents/PTUT/FolderToAnalyse");
 	private List<File> files = new ArrayList<>();
 
-	public JavaAnalyser() {}
-
+	public JavaAnalyser() {
+	}
 
 	public void listFilesForFolder(File folder) {
 		for (File fileEntry : folder.listFiles()) {
@@ -25,228 +35,349 @@ public class JavaAnalyser {
 		}
 	}
 
-	public void attributesAnalysis(String line, UMLClass newClass) {
-		UMLAttribute newAttribute = new UMLAttribute();
-		newAttribute.setId(Integer.toString(++uniqueID));
-		newAttribute.setMyClassId(newClass.getId());
+	public UMLClass detectClassName(String classString, UMLClass returnClass) {
+		String[] keyWords = classString.split(" ");
+		String step = "init";
 
-		String varName = "";
-		String varType = "";
-		int endOfVarNameIndex;
-		int endOfVarTypeIndex;
-		if(line.contains("=")) {
-			endOfVarNameIndex = line.indexOf("=");
-			while(!Character.isLetter(line.charAt(endOfVarNameIndex))) {
-				endOfVarNameIndex--;
+		for (String word : keyWords) {
+			if (word.length() == 0) {
+				continue;
 			}
-		}
-		else {
-			endOfVarNameIndex = line.indexOf(";");
-			while(!Character.isLetter(line.charAt(endOfVarNameIndex))) {
-				endOfVarNameIndex--;
-			}
-		}
-		for (int i = endOfVarNameIndex; Character.isLetter(line.charAt(i)) ; i--) {
-
-			varName = line.charAt(i) + varName;
-		}
-		newAttribute.setName(varName);
-		endOfVarTypeIndex = endOfVarNameIndex;
-		while(Character.isLetter(line.charAt(endOfVarTypeIndex))) {
-			endOfVarTypeIndex--;
-		}
-		while(line.charAt(endOfVarTypeIndex) == ' ') {
-			endOfVarTypeIndex--;
-		}
-		
-		boolean characterSeen = false;
-		for (int i = endOfVarTypeIndex; characterSeen ? Character.isLetter(line.charAt(i)) : true ; i--) {
-			if(Character.isLetter(line.charAt(i))) {
-				characterSeen = true;
-			}
-			if(line.charAt(i) != ' ' && !(Character.isDigit(line.charAt(i)) && (!Character.isLetter(line.charAt(i+1)) && !Character.isDigit(line.charAt(i+1))))) {
-				varType = line.charAt(i) + varType;
-			}
-		}
-		newAttribute.setType(varType);
-		ArrayList<UMLAttribute> newVarList = newClass.getAttributes();
-		newVarList.add(newAttribute);
-		newClass.setAttributes(newVarList);
-	}
-
-	
-	public List<UMLParameter> detectParametersOnOperation(String line, UMLOperation operation) {
-		List<UMLParameter> parameters = new ArrayList<>();
-		int endOfOperationVar = line.indexOf(')');
-		boolean isNameOfVar = true;
-
-		for (int i = endOfOperationVar; i > line.indexOf('(') ; i--) {
-			if(isNameOfVar) {
-				if(Character.isLetter(line.charAt(i))) {
-					if(parameters.size() == 0) {
-						parameters.add(new UMLParameter());
-						parameters.get(parameters.size()-1).setId(Integer.toString(++uniqueID));
-						parameters.get(parameters.size()-1).setMyOperationId(operation.getId());
-					}
-					while(Character.isLetter(line.charAt(i))) {
-						parameters.get(parameters.size()-1).
-						setName(line.charAt(i) + parameters.get(parameters.size()-1).getName());
-						i--; //!
-					}
-					isNameOfVar = false;
+			boolean breakAfter = false;
+			if (word.equals("class")) {
+				step = "name";
+			} else if (word.equals("interface")) {
+				step = "name";
+				returnClass.setInterface(true);
+			} else if (word.equals("abstract")) {
+				returnClass.setAbstract();
+			} else if (word.equals("implements")) {
+				returnClass.setAbstract();
+				step = "implements";
+			} else if (word.equals("extends")) {
+				returnClass.setAbstract();
+				step = "extends";
+			} else if (step.equals("name")
+					&& (!word.equals("public") && !word.equals("private") && !word.equals("protected")
+							&& !word.equals("abstract") && !word.equals("class") && !word.equals("interface")
+							&& !word.equals("final") && !word.equals("implements") && !word.equals("extends"))) {
+				if (word.contains("{")) {
+					breakAfter = true;
+					word = word.replace("{", "");
 				}
+				returnClass.setName(word);
+				step = "";
+				if (breakAfter) {
+					break;
+				}
+			} else if (step.equals("extends")
+					&& (!word.equals("public") && !word.equals("private") && !word.equals("protected")
+							&& !word.equals("abstract") && !word.equals("class") && !word.equals("interface")
+							&& !word.equals("final") && !word.equals("implements") && !word.equals("extends"))) {
+				if (word.contains("{")) {
+					breakAfter = true;
+					word = word.replace("{", "");
+				}
+				returnClass.setExtendedClass(word);
+				step = "";
+				if (breakAfter) {
+					break;
+				}
+			} else if (step.equals("implements") && (!word.equals("public") && !word.equals("private")
+					&& !word.equals("protected") && !word.equals("abstract") && !word.equals("class")
+					&& !word.equals("interface") && !word.equals("final") && !word.equals("implements")
+					&& !word.equals("extends") && !word.equals(","))) {
+
+				word = word.replace("{", "");
+				String[] implementedClasses = word.split(",");
+				List<String> filtredImplementedClasses = new ArrayList<>();
+				for (String implementedClass : implementedClasses) {
+					if (implementedClass.length() > 0)
+						filtredImplementedClasses.add(implementedClass);
+				}
+				for (String implementedClass : filtredImplementedClasses) {
+					returnClass.addImplementedClass(implementedClass);
+				}
+				break;
 			}
-			else {
-				if(Character.isLetter(line.charAt(i))) {
-					while(line.charAt(i) != ',' && line.charAt(i) != '(' && line.charAt(i) != ' ') {
-
-						parameters.get(parameters.size()-1).
-						setType(line.charAt(i) + parameters.get(parameters.size()-1).getType());
-						i--; //!
-					}
-					isNameOfVar = true;
-					if(line.charAt(i) == ' ') {
-						while(line.charAt(i) == ' ') {
-							i--;
-						}
-						if(Character.isLetter(line.charAt(i))) {
-							//prefix
-						}
-					}
-					if(line.charAt(i) == ',') {
-						parameters.add(new UMLParameter());
-						parameters.get(parameters.size()-1).setId(Integer.toString(++uniqueID));
-						parameters.get(parameters.size()-1).setMyOperationId(operation.getId());
-
-					}
-				} 
-			}
-
 
 		}
-		return parameters;
+		return returnClass;
 	}
-	
-	public void operationAnalysis(String line, UMLClass newClass) {
 
+	public UMLClass analyseOperation(String pieceOfCode, UMLClass returnClass) {
 		UMLOperation newOperation = new UMLOperation();
 		newOperation.setId(Integer.toString(++uniqueID));
-		newOperation.setMyClassId(newOperation.getId());
-		String operationName = "";
-		String operationReturnType = "";
-		int endOfOperationNameIndex = line.indexOf('(');
-		int endOfOperationReturnType;
+		newOperation.setMyClassId(returnClass.getId());
+		boolean returnTypeBoolean = false;
+		String[] keyWords = pieceOfCode.substring(0, pieceOfCode.indexOf("(")).split(" ");
+		boolean allInfos = false;
+		for (String word : keyWords) {
+			if (!allInfos) {
+				switch (word) {
+				case "static":
+					newOperation.setStatic(true);
+					break;
 
-		while(!Character.isLetter(line.charAt(endOfOperationNameIndex))) {
-			endOfOperationNameIndex--;
-		}
+				case "abstract":
+					newOperation.setAbstract();
+					break;
 
-		for (int i = endOfOperationNameIndex; Character.isLetter(line.charAt(i)) ; i--) {
-			operationName = line.charAt(i) + operationName;
-			endOfOperationReturnType = i;
-		}
-		newOperation.setName(operationName);
-		List<UMLParameter> parameters = detectParametersOnOperation(line, newOperation);
-		newOperation.setUmlParameters(parameters);
+				case "public":
+				case "private":
+				case "protected":
+					newOperation.setVisibility(word);
+					break;
+				default:
+					if (!returnTypeBoolean) {
+						if (word.equals(returnClass.getName())) {
+							newOperation.setReturnType(word);
+							newOperation.setName(word);
+							allInfos = true;
+						} else {
+							returnTypeBoolean = true;
+							newOperation.setReturnType(word);
+						}
 
-		if(!newOperation.getName().equals(newClass.getName())) {
-			endOfOperationReturnType = endOfOperationNameIndex;
-			while (Character.isLetter(line.charAt(endOfOperationReturnType))){
-				endOfOperationReturnType--;
+					} else {
+						newOperation.setName(word);
+						allInfos = true;
+					}
+					break;
+				}
+			} else {
+				break;
 			}
-			
-			while (!Character.isLetter(line.charAt(endOfOperationReturnType))){
-				endOfOperationReturnType--;
-			}
-			for(int i = endOfOperationReturnType; Character.isLetter(line.charAt(i)) ; i--) {
-				operationReturnType	= line.charAt(i) + operationReturnType;
-			}
-			newOperation.setReturnType(operationReturnType);
-		}
-		else {
-			newOperation.setReturnType("");
-		}
 
-
-		ArrayList<UMLOperation> newOpList = newClass.getOperations();
-		newOpList.add(newOperation);
-		newClass.setOperations(newOpList);
+		}
+		newOperation = analyseParameters(newOperation, pieceOfCode);
+		returnClass.addOperation(newOperation);
+		return returnClass;
 	}
 
+	public UMLOperation analyseParameters(UMLOperation operation, String operationString) {
+		String parametersString = operationString.substring(operationString.indexOf("(") + 1,
+				operationString.indexOf(")"));
+		parametersString = parametersString.trim();
+		String[] parameters = parametersString.split(" ");
+		boolean returnType = false;
+		UMLParameter newParameter = new UMLParameter();
+		for (String word : parameters) {
+			if (!returnType) {
+				newParameter.setType(word);
+				returnType = true;
+			} else {
+				newParameter.setName(word.replace(",", ""));
+				newParameter.setId(Integer.toString(++uniqueID));
+				newParameter.setMyClassId(operation.getMyClassId());
+				newParameter.setMyOperationId(operation.getId());
+
+				operation.addParameter(newParameter);
+				returnType = false;
+				newParameter = new UMLParameter();
+			}
+		}
+		return operation;
+	}
+
+	public UMLClass analyseAttribute(String pieceOfCode, UMLClass returnClass) {
+		UMLAttribute newAttribute = new UMLAttribute();
+		newAttribute.setId(Integer.toString(++uniqueID));
+		newAttribute.setMyClassId(returnClass.getId());
+		String[] words = pieceOfCode.split(" ");
+		boolean returnType = false;
+		for (String word : words) {
+
+			if (word.equals("static")) {
+				newAttribute.setStatic(true);
+			} else if (word.equals("private") || word.equals("public") || word.equals("protected")) {
+				newAttribute.setVisibility(word);
+			} else if (!returnType) {
+				newAttribute.setType(word);
+				returnType = true;
+			} else {
+				newAttribute.setName(word);
+			}
+		}
+		returnClass.addAttribute(newAttribute);
+		return returnClass;
+	}
+
+	public UMLClass analyseClassOperationsAndAttributes(String classString, UMLClass returnClass, int startIndex) {
+		String pieceOfCodetoAnalyse = classString.substring(startIndex);
+		int endOfPieceOfCodeToAnalyse = pieceOfCodetoAnalyse.length() - 1;
+		int startOfNextPiece = pieceOfCodetoAnalyse.length() - 1;
+
+		for (int i = 0; i < endOfPieceOfCodeToAnalyse; i++) {
+			if (pieceOfCodetoAnalyse.charAt(i) == ';') {
+				startOfNextPiece = startIndex + i + 1;
+				if (pieceOfCodetoAnalyse.substring(0, i).contains("=")) {
+					endOfPieceOfCodeToAnalyse = pieceOfCodetoAnalyse.substring(0, i).indexOf("=");
+				} else {
+					endOfPieceOfCodeToAnalyse = i;
+				}
+				break;
+			} else if (pieceOfCodetoAnalyse.charAt(i) == '{') {
+				endOfPieceOfCodeToAnalyse = i;
+				int bracketsToClose = 1;
+				for (int j = i + 1; j < pieceOfCodetoAnalyse.length(); j++) {
+					if (pieceOfCodetoAnalyse.charAt(j) == '{') {
+						bracketsToClose += 1;
+					} else if (pieceOfCodetoAnalyse.charAt(j) == '}') {
+						bracketsToClose -= 1;
+					}
+					if (bracketsToClose == 0) {
+						startOfNextPiece = startIndex + j + 1;
+						break;
+					}
+				}
+				break;
+			}
+		}
+		if (endOfPieceOfCodeToAnalyse == pieceOfCodetoAnalyse.length() - 1)
+			return returnClass;
+		pieceOfCodetoAnalyse = classString.substring(startIndex, startIndex + endOfPieceOfCodeToAnalyse);
+		if (pieceOfCodetoAnalyse.contains("(")) {
+			returnClass = analyseOperation(pieceOfCodetoAnalyse.trim(), returnClass);
+		} else {
+			returnClass = analyseAttribute(pieceOfCodetoAnalyse.trim(), returnClass);
+		}
+
+		return analyseClassOperationsAndAttributes(classString, returnClass, startOfNextPiece);
+	}
+
+	public UMLClass analyseClass(String classString, UMLClass returnClass) {
+		int classbegining = 0;
+		returnClass = detectClassName(classString, returnClass);
+		while (classString.charAt(classbegining) != '{') {
+			classbegining += 1;
+		}
+		classbegining += 1; // On ne souhaite pas considerer la première accolade
+
+		return analyseClassOperationsAndAttributes(classString, returnClass, classbegining);
+	}
+
+	public String formatClassString(String classString) {
+		classString = classString.replaceAll("\s+", " ").strip();
+		classString = classString.replaceAll("\\s+>\\s+", "> ");
+		classString = classString.replaceAll(">", "> ");
+		classString = classString.replaceAll("\\s+>", "> ");
+		classString = classString.replaceAll("\\s+<\\s+", "< ");
+		classString = classString.replaceAll("<", "< ");
+		classString = classString.replaceAll("\\s+<", "< ");
+		classString = classString.replaceAll("<\\s+", "<");
+		classString = classString.replaceAll("[(]", " ( ");
+		classString = classString.replaceAll("[)]", " ) ");
+		classString = classString.replaceAll("[{]", " { ");
+		classString = classString.replaceAll("[}]", " } ");
+		classString = classString.replaceAll("\s+[)]\s+", " ) ");
+		classString = classString.replaceAll("\s+[(]\s+", " ( ");
+		classString = classString.replaceAll("\s+[{]\s+", " { ");
+		classString = classString.replaceAll("\s+[}]\s+", " } ");
+		classString = classString.replaceAll("\s+", " ").strip();
+		return classString;
+	}
 
 	public UMLDiagram analyseFiles() throws IOException {
 		UMLDiagram newDiagram = new UMLDiagram();
-		for(File file : files) {
+		for (File file : files) {
+			String classString = "";
 			UMLClass newClass = new UMLClass();
-			newClass.setId(Integer.toString(++uniqueID) );
+			newClass.setId(Integer.toString(++uniqueID));
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-			while(reader.ready()) {
+			while (reader.ready()) {
 				String line = reader.readLine();
-				if(line.contains("class ")){
-					//ligne qui contient la déclaration de la classe
-					int indexOfStartClass = line.indexOf("class ") + 6;
-					String className = "";
-					for(int i = indexOfStartClass; i <= line.length()-1 && Character.isLetter(line.charAt(i)); i++) { //+7 permet d'obtenir l'index de la premiere lettre du nom de la classe
-						className += line.charAt(i);
-					}
-					System.out.println("class : " + className);
-					newClass.setName(className);
-				}
-				else if((line.contains("private") || line.contains("public")) && line.contains(";")) {
-					//Ligne qui contient la déclaration d'une variable
-					attributesAnalysis(line, newClass);
-
-				}
-				else if((line.contains("private") || line.contains("public")) && line.contains("(")) {
-					//Ligne qui contient la déclaration d'une d'une fonction
-					operationAnalysis(line, newClass);
-				}
+				classString += line;
 			}
-			
+
+			classString = formatClassString(classString);
+			newClass = analyseClass(classString, newClass);
 			List<UMLClass> newClasses = newDiagram.getMyClasses();
 			newClasses.add(newClass);
-			newDiagram.setMyClasses(newClasses) ;
+			newDiagram.setMyClasses(newClasses);
 		}
-		
 		detectAssociations(newDiagram);
 		return newDiagram;
 	}
-	
 
-	
 	public void detectAssociations(UMLDiagram diagram) {
-		for(UMLClass c : diagram.getMyClasses()) {
-			for(UMLAttribute a : c.getAttributes()) {
-				if(diagram.getClassWithName(a.getType()) != null) {
+		for (UMLClass c : diagram.getMyClasses()) {
+			List<UMLAttribute> attributesToRemove = new ArrayList<>();
+			for (UMLAttribute a : c.getAttributes()) {
+				if (diagram.getClassWithName(a.getType()) != null) {
 					UMLAssociation newAssociation = new UMLAssociation();
 					newAssociation.setId(Integer.toString(++uniqueID));
 					newAssociation.setName("Est compose de");
 					UMLAssociationEnd end1 = new UMLAssociationEnd();
 					UMLAssociationEnd end2 = new UMLAssociationEnd();
-					end1.setId(Integer.toString(++uniqueID));
-					end1.setAssociatedClassId(c.getId());
-					end1.setName("");
-					end1.setAggregationType("none");
-					end1.setMultiplicity("");
 					end2.setId(Integer.toString(++uniqueID));
-					end2.setAssociatedClassId(diagram.getClassWithName(a.getType()).getId());
-					end2.setName("my"+a.getName());
+					end2.setAssociatedClassId(c.getId());
+					end1.setId(Integer.toString(++uniqueID));
+					end1.setAssociatedClassId(diagram.getClassWithName(a.getType()).getId());
+					end1.setName(a.getName());
 					end2.setAggregationType("shared");
-					end2.setMultiplicity("1");
-					if(a.getType().contains("[]") || (a.getType().contains("<") && a.getType().contains(">"))) {
-						end2.setMultiplicity("*");
-						end2.setName(end2.getName() + "s");
+					if (a.getType().contains("[]") || (a.getType().contains("<") && a.getType().contains(">"))) {
+						end1.setMultiplicity("*");
 					}
-					
-					
+					else {
+						end1.setMultiplicity("1");
+					}
 					newAssociation.setEnd1(end1);
 					newAssociation.setEnd2(end2);
 					c.addAssociation(newAssociation);
+					attributesToRemove.add(a);
 				}
 			}
+			for(UMLAttribute attribute : attributesToRemove) {
+				c.removeAttribute(attribute);
+			}
+			
+			for (UMLOperation o : c.getOperations()) {
+				for (UMLParameter p : o.getUmlParameters()) {
+					if (diagram.getClassWithName(p.getType()) != null) {
+						boolean isAlsoAnAttribute = false;
+						for (UMLAttribute a : c.getAttributes()) {
+							if (a.getType() == p.getType()) {
+								isAlsoAnAttribute = true;
+							}
+						}
+						if (!isAlsoAnAttribute) {
+							UMLSourceTargetRelation newDependency = new UMLSourceTargetRelation();
+							newDependency.setId(Integer.toString(++uniqueID));
+							newDependency.setDependencyType("UMLDependency");
+							newDependency.setName("Utilise");
+							newDependency.setSource(c.getId());
+							newDependency.setTarget(diagram.getClassWithName(p.getType()).getId());
+							c.addDependency(newDependency);
+						}
+					}
+				}
+			}
+			if (!c.getExtendedClass().equals("")) {
+				UMLSourceTargetRelation newDependency = new UMLSourceTargetRelation();
+				newDependency.setId(Integer.toString(++uniqueID));
+				newDependency.setDependencyType("UMLGeneralization");
+				;
+				newDependency.setName("Hérite de");
+				newDependency.setSource(c.getId());
+				newDependency.setTarget(diagram.getClassWithName(c.getExtendedClass()).getId());
+				c.addDependency(newDependency);
+			}
+
+			
+			for (String implementedClass : c.getImplementedClasses()) {
+				UMLSourceTargetRelation newDependency = new UMLSourceTargetRelation();
+				newDependency.setId(Integer.toString(++uniqueID));
+				newDependency.setDependencyType("UMLInterfaceRealization");
+				newDependency.setName("Implémente");
+				newDependency.setSource(c.getId());
+				newDependency.setTarget(diagram.getClassWithName(implementedClass).getId());
+				c.addDependency(newDependency);
+			}
+
 		}
 	}
-	
+
 	public void generateJsonFile(UMLDiagram diagram) {
 		MdjGenerator j = new MdjGenerator();
 		j.generateJsonFileFromDiagram("C:/Users/Mathys Garoui/Documents/PTUT/JsonGeneration", diagram);
@@ -256,46 +387,30 @@ public class JavaAnalyser {
 		listFilesForFolder(folder);
 		UMLDiagram d = analyseFiles();
 		String indent = "";
-		for(UMLClass c : d.getMyClasses()) {
+		for (UMLClass c : d.getMyClasses()) {
 			indent = "Class : ";
-			System.out.println(indent+c.getName());
+			System.out.println(indent + c.getName());
 			indent = "    ";
-			System.out.println(indent+"------Variables------");
-			for(UMLAttribute v : c.getAttributes()) {
-				System.out.println(indent+ v.getType() + " " + v.getName() + " "+ v.getId());
+			System.out.println(indent + "------Variables------");
+			for (UMLAttribute v : c.getAttributes()) {
+				System.out.println(indent + v.getType() + " " + v.getName() + " " + v.getId());
 			}
-			System.out.println(indent+"------Operations------");
-			for(UMLOperation o : c.getOperations()) {
+			System.out.println(indent + "------Operations------");
+			for (UMLOperation o : c.getOperations()) {
 				indent = "    ";
-				System.out.println(indent+ o.getReturnType() + " " + o.getName() + " ");
+				System.out.println(indent + o.getReturnType() + " " + o.getName() + " ");
 				indent = "        ";
-				for(UMLParameter v : o.getUmlParameters()) {
-					System.out.println(indent+ v.getType() + " " + v.getName());
+				for (UMLParameter v : o.getUmlParameters()) {
+					System.out.println(indent + v.getType() + " " + v.getName());
 				}
 			}
 		}
 		generateJsonFile(d);
 
 	}
-	
-	
 
 	public void debug(String log) {
 		System.out.println("!debug : " + log);
 	}
-	
-	
-	
 
 }
-/*
-Contraintes du code :
-	-la déclaration d'une fonction / variable se fait sur une seule ligne (hors implémentation)
-	-les mots clés doivent être séparés d'un seul espace
-	-une seule classe par fichier
-	-une déclaration max par ligne
-	-preciser public ou privé
-	-valeur par défaut de variables dans la déclaration d'une fonction momentannément indisponible
-	-le fichier ne peut pas contenir le mot clé "class" sauf pour la définition de la class
- */
-

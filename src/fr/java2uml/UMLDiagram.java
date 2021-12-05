@@ -17,7 +17,25 @@ public class UMLDiagram {
 	
 	public UMLClass getClassWithName(String className) {
 		for(UMLClass c : getMyClasses()) {
-			if(c.getName().equals(className)) {
+			if(className.contains("[]")) {
+				String trueClassName = "";
+				for(int i = 0; i < className.length(); i++) {
+					if(Character.isLetter(className.charAt(i)) || Character.isDigit(className.charAt(i))) {
+						trueClassName+=className.charAt(i);
+					}
+				}
+				return getClassWithName(trueClassName);
+			}
+			else if(className.contains("<") && className.contains(">")){
+				String trueClassName = "";
+				for(int i = className.indexOf('<'); i < className.indexOf('>'); i++) {
+					if(Character.isLetter(className.charAt(i)) || Character.isDigit(className.charAt(i))) {
+						trueClassName+=className.charAt(i);
+					}
+				}
+				return getClassWithName(trueClassName);
+			}
+			else if(c.getName().equals(className)) {
 				return c;
 			}
 		}

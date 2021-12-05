@@ -2,10 +2,10 @@ package fr.uml2java;
 
 public class UMLAssociationEnd extends UMLObject {
     private String visibility = "public";
-    private String multiplicity;
-    private String reference;
-    private String associatedClassId;
-    private String aggregationType;
+    private String multiplicity = "";
+    private String reference = "";
+    private String associatedClassId = "";
+    private String aggregationType = "none";
 
 
 
