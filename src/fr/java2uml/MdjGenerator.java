@@ -7,6 +7,7 @@ import fr.uml2java.*;
 
 public class MdjGenerator {
 
+	\\Il ne s'agit pas de la version finale mais d'une version executable et fonctionnelle. La version finale impl√©mente des JSONObject
 	private List<String> UMLClassList = new ArrayList<>();
 	private List<String> UMLClassViewList = new ArrayList<>();
 	private List<String> UMLAssociationViewList = new ArrayList<>();
@@ -332,9 +333,9 @@ public class MdjGenerator {
 		try {
 			File file = new File(path + "/Diagram.mdj");
 			if (file.createNewFile()) {
-				System.out.println("Fichier crÈÈ: " + file.getName());
+				System.out.println("Fichier cr√©√©: " + file.getName());
 			} else {
-				System.out.println("Le fichier existe dÈj‡.");
+				System.out.println("Le fichier existe d√©j√†.");
 			}
 			FileWriter writer = new FileWriter(path + "/Diagram.mdj");
 			writer.write(data);
