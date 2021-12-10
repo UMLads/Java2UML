@@ -17,9 +17,10 @@ import fr.uml2java.UMLParameter;
 
 public class JavaAnalyser {
 
+	\\PENSER A MODIFIER LES STRING ligne 23 et 384
 	public static int uniqueID;
 
-	private File folder = new File("C:/Users/Mathys Garoui/Documents/PTUT/FolderToAnalyse");
+	private File folder = new File("Dossier contenant les fichiers Java (uniquement) Ã  renseigner !");
 	private List<File> files = new ArrayList<>();
 
 	public JavaAnalyser() {
@@ -252,7 +253,7 @@ public class JavaAnalyser {
 		while (classString.charAt(classbegining) != '{') {
 			classbegining += 1;
 		}
-		classbegining += 1; // On ne souhaite pas considerer la première accolade
+		classbegining += 1; // On ne souhaite pas considerer la premiÃ¨re accolade
 
 		return analyseClassOperationsAndAttributes(classString, returnClass, classbegining);
 	}
@@ -358,7 +359,7 @@ public class JavaAnalyser {
 				newDependency.setId(Integer.toString(++uniqueID));
 				newDependency.setDependencyType("UMLGeneralization");
 				;
-				newDependency.setName("Hérite de");
+				newDependency.setName("HÃ©rite de");
 				newDependency.setSource(c.getId());
 				newDependency.setTarget(diagram.getClassWithName(c.getExtendedClass()).getId());
 				c.addDependency(newDependency);
@@ -369,7 +370,7 @@ public class JavaAnalyser {
 				UMLSourceTargetRelation newDependency = new UMLSourceTargetRelation();
 				newDependency.setId(Integer.toString(++uniqueID));
 				newDependency.setDependencyType("UMLInterfaceRealization");
-				newDependency.setName("Implémente");
+				newDependency.setName("ImplÃ©mente");
 				newDependency.setSource(c.getId());
 				newDependency.setTarget(diagram.getClassWithName(implementedClass).getId());
 				c.addDependency(newDependency);
@@ -380,37 +381,14 @@ public class JavaAnalyser {
 
 	public void generateJsonFile(UMLDiagram diagram) {
 		MdjGenerator j = new MdjGenerator();
-		j.generateJsonFileFromDiagram("C:/Users/Mathys Garoui/Documents/PTUT/JsonGeneration", diagram);
+		j.generateJsonFileFromDiagram("Dossier contenant les fichiers de sortie Ã  renseigner !", diagram);
 	}
 
 	public void startAnalyse() throws IOException {
 		listFilesForFolder(folder);
 		UMLDiagram d = analyseFiles();
-		String indent = "";
-		for (UMLClass c : d.getMyClasses()) {
-			indent = "Class : ";
-			System.out.println(indent + c.getName());
-			indent = "    ";
-			System.out.println(indent + "------Variables------");
-			for (UMLAttribute v : c.getAttributes()) {
-				System.out.println(indent + v.getType() + " " + v.getName() + " " + v.getId());
-			}
-			System.out.println(indent + "------Operations------");
-			for (UMLOperation o : c.getOperations()) {
-				indent = "    ";
-				System.out.println(indent + o.getReturnType() + " " + o.getName() + " ");
-				indent = "        ";
-				for (UMLParameter v : o.getUmlParameters()) {
-					System.out.println(indent + v.getType() + " " + v.getName());
-				}
-			}
-		}
 		generateJsonFile(d);
 
-	}
-
-	public void debug(String log) {
-		System.out.println("!debug : " + log);
 	}
 
 }
