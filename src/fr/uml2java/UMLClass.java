@@ -2,7 +2,11 @@ package fr.uml2java;
 
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.jr.ob.JSON;
 import fr.java2uml.UMLSourceTargetRelation;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class UMLClass extends UMLObject {
     private boolean isAbstract = false;
@@ -12,8 +16,7 @@ public class UMLClass extends UMLObject {
 	private ArrayList<UMLAttribute> attributes;
     private ArrayList<UMLOperation> operations;
     private ArrayList<UMLAssociation> associations;
-
-    private ArrayList<UMLSourceTargetRelation> dependencies;
+    private ArrayList<UMLSourceTargetRelation> umlSourceTargetRelations;
 
     private String extendedClass = "";
     private ArrayList<String> implementedClasses = new ArrayList<>();
@@ -42,7 +45,7 @@ public class UMLClass extends UMLObject {
         attributes = new ArrayList<>();
         operations = new ArrayList<>();
         associations = new ArrayList<>();
-        dependencies = new ArrayList<>();
+        umlSourceTargetRelations = new ArrayList<>();
     }
 
     public ArrayList<UMLAttribute> getAttributes() {
@@ -69,12 +72,12 @@ public class UMLClass extends UMLObject {
         this.associations = associations;
     }
     
-    public ArrayList<UMLSourceTargetRelation> getDependencies() {
-		return dependencies;
+    public ArrayList<UMLSourceTargetRelation> getUmlSourceTargetRelations() {
+		return umlSourceTargetRelations;
 	}
 
-	public void setDependencies(ArrayList<UMLSourceTargetRelation> dependencies) {
-		this.dependencies = dependencies;
+	public void setUmlSourceTargetRelations(ArrayList<UMLSourceTargetRelation> umlSourceTargetRelations) {
+		this.umlSourceTargetRelations = umlSourceTargetRelations;
 	}
 
     public boolean isInterface() {
@@ -135,7 +138,7 @@ public class UMLClass extends UMLObject {
     }
     
     public void addDependency(UMLSourceTargetRelation newDependency) {
-        dependencies.add(newDependency);
+        umlSourceTargetRelations.add(newDependency);
     }
     
 
@@ -167,7 +170,53 @@ public class UMLClass extends UMLObject {
 		this.implementedClasses.add(implementedClass);
 	}
 
+    public JSONObject toJson() throws JSONException {
+        JSONObject umlClass = new JSONObject();
+        umlClass.put("_type", isInterface() ? "UMLInterface" : "UMLClass");
+        umlClass.put("_id", getId());
+        JSONObject parent = new JSONObject();
+        parent.put("$ref", "model_id");
+        umlClass.put("parent", parent);
+        umlClass.put("name", getName());
+        umlClass.put("isAbstract", isAbstract());
+        JSONArray ownedElements = new JSONArray();
+        for(UMLAssociation association : getAssociations()){
+            ownedElements.put(association.toJson());
+        }
+        for(UMLSourceTargetRelation sourceTargetRelation : getUmlSourceTargetRelations()){
+            ownedElements.put(sourceTargetRelation.toJson());
+        }
+        umlClass.put("ownedElements", ownedElements);
+        JSONArray attributes = new JSONArray();
+        for(UMLAttribute attribute : getAttributes()){
+            attributes.put(attribute.toJson());
+        }
+        umlClass.put("attributes", attributes);
+        JSONArray operations = new JSONArray();
+        for(UMLOperation operation : getOperations()){
+            operations.put(operation.toJson());
+        }
+        umlClass.put("operations", operations);
+        return umlClass;
+    }
+
+    public JSONObject toJsonView() throws JSONException {
+        JSONObject classView = new JSONObject();
+        classView.put("_type", isInterface() ? "UMLInterfaceView" : "UMLClassView");
+        classView.put("_id", getId()+"view");
+        JSONObject parent = new JSONObject();
+        parent.put("$ref", "diagram_id");
+        classView.put("_parent", parent);
+        JSONObject model = new JSONObject();
+        model.put("$ref", getId());
+        classView.put("model", model);
+        classView.put("containerChangeable", true);
+        classView.put("left", 248);
+        classView.put("top", 320);
+        classView.put("width", 152);
+        classView.put("height", 71);
+        return classView;
+    }
 
 
-	
 }

@@ -1,5 +1,10 @@
 package fr.uml2java;
 
+import fr.java2uml.JavaAnalyser;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,4 +109,38 @@ public class UMLOperation extends UMLObject {
 	public void setStatic(boolean isStatic) {
 		this.isStatic = isStatic;
 	}
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject operation = new JSONObject();
+        operation.put("_type", "UMLOperation");
+        operation.put("_id", getId());
+        JSONObject parent = new JSONObject();
+        parent.put("$ref", getMyClassId());
+        operation.put("_parent", parent);
+        operation.put("name", getName());
+        operation.put("isStatic", isStatic());
+        operation.put("isAbstract", isAbstract());
+        operation.put("visibility", getVisibility());
+        JSONArray parameters = new JSONArray();
+        for(UMLParameter parameter : getUmlParameters()){
+            parameters.put(parameter.toJson());
+        }
+        parameters.put(getJsonReturnParameter());
+        operation.put("parameters", parameters);
+        return operation;
+    }
+
+    public JSONObject getJsonReturnParameter() throws JSONException {
+        JSONObject returnParameter = new JSONObject();
+        returnParameter.put("_type", "UMLParameter");
+        returnParameter.put("_id", Integer.toString(++JavaAnalyser.uniqueID));
+        JSONObject parent = new JSONObject();
+        parent.put("$ref", getId());
+        returnParameter.put("_parent", parent);
+        returnParameter.put("type", getReturnType());
+        returnParameter.put("direction", "return");
+
+        return returnParameter;
+
+    }
 }

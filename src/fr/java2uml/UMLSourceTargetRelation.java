@@ -1,15 +1,16 @@
 package fr.java2uml;
 
 
-import java.util.ArrayList;
-
 import fr.uml2java.UMLObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class UMLSourceTargetRelation extends UMLObject {
     private String target;
 	private String source;
-	private String dependencyType = "";
-    
+	private String sourceTargetType = "";
+    private String myClassId;
+
     public String getTarget() {
 		return target;
 	}
@@ -35,6 +36,9 @@ public class UMLSourceTargetRelation extends UMLObject {
         s += "\t\t\t" + source;
         return s;
     }
+    public String getMyClassId() {return myClassId;}
+
+    public void setMyClassId(String myClassId) {this.myClassId = myClassId;}
 
     public String getName() {
         return super.getName();
@@ -60,11 +64,52 @@ public class UMLSourceTargetRelation extends UMLObject {
         super.setParent(parent);
     }
 
-	public String getDependencyType() {
-		return dependencyType;
+	public String getSourceTargetType() {
+		return sourceTargetType;
 	}
 
-	public void setDependencyType(String dependencyType) {
-		this.dependencyType = dependencyType;
+	public void setSourceTargetType(String sourceTargetType) {
+		this.sourceTargetType = sourceTargetType;
 	}
+
+    public JSONObject toJsonView() throws JSONException {
+        JSONObject sourceTargetRelationView = new JSONObject();
+        sourceTargetRelationView.put("_type", getSourceTargetType()+"View");
+        sourceTargetRelationView.put("_id", Integer.toString(++JavaAnalyser.uniqueID));
+        JSONObject parent = new JSONObject();
+        parent.put("$ref", "diagram_id");
+        sourceTargetRelationView.put("_parent", parent);
+        JSONObject model = new JSONObject();
+        model.put("$ref", getId());
+        sourceTargetRelationView.put("model", model);
+        JSONObject head = new JSONObject();
+        head.put("$ref", getTarget()+"view");
+        sourceTargetRelationView.put("head", head);
+        JSONObject tail = new JSONObject();
+        tail.put("$ref", getSource()+"view");
+        sourceTargetRelationView.put("tail", tail);
+        sourceTargetRelationView.put("lineStyle", 1);
+        sourceTargetRelationView.put("points", "178:325;248:423");
+        sourceTargetRelationView.put("showVisibility", true);
+
+        return sourceTargetRelationView;
+    }
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject sourceTargetRelation = new JSONObject();
+        sourceTargetRelation.put("_type", getSourceTargetType());
+        sourceTargetRelation.put("_id", getId());
+        JSONObject parent = new JSONObject();
+        parent.put("$ref", getMyClassId());
+        sourceTargetRelation.put("_parent", parent);
+        sourceTargetRelation.put("name", getName());
+        JSONObject source = new JSONObject();
+        source.put("$ref", getSource());
+        sourceTargetRelation.put("source", source);
+        JSONObject target = new JSONObject();
+        target.put("$ref", getTarget());
+        sourceTargetRelation.put("target", target);
+        return sourceTargetRelation;
+
+    }
 }

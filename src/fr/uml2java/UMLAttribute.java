@@ -1,5 +1,8 @@
 package fr.uml2java;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class UMLAttribute extends UMLObject {
     private String type;
     private String myClassId;
@@ -74,4 +77,18 @@ public class UMLAttribute extends UMLObject {
 	public void setStatic(boolean isStatic) {
 		this.isStatic = isStatic;
 	}
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject attribute = new JSONObject();
+        attribute.put("_type", "UMLAttribute");
+        attribute.put("_id", getId());
+        JSONObject parent = new JSONObject();
+        parent.put("$ref", getMyClassId());
+        attribute.put("_parent", parent);
+        attribute.put("name", getName());
+        attribute.put("visibility", getVisibility());
+        attribute.put("isStatic", isStatic());
+        attribute.put("type", getType());
+        return attribute;
+    }
 }

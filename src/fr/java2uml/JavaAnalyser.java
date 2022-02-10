@@ -14,13 +14,14 @@ import fr.uml2java.UMLAttribute;
 import fr.uml2java.UMLClass;
 import fr.uml2java.UMLOperation;
 import fr.uml2java.UMLParameter;
+import org.json.JSONException;
 
 public class JavaAnalyser {
 
-	\\PENSER A MODIFIER LES STRING ligne 23 et 384
+	//PENSER A MODIFIER LES STRING ligne 23 et 384
 	public static int uniqueID;
 
-	private File folder = new File("Dossier contenant les fichiers Java (uniquement) à renseigner !");
+	private File folder = new File("C:\\Users\\mathy\\Documents\\PTUT\\FolderToAnalyse");
 	private List<File> files = new ArrayList<>();
 
 	public JavaAnalyser() {
@@ -307,6 +308,7 @@ public class JavaAnalyser {
 			for (UMLAttribute a : c.getAttributes()) {
 				if (diagram.getClassWithName(a.getType()) != null) {
 					UMLAssociation newAssociation = new UMLAssociation();
+					newAssociation.setMyClassId(c.getId());
 					newAssociation.setId(Integer.toString(++uniqueID));
 					newAssociation.setName("Est compose de");
 					UMLAssociationEnd end1 = new UMLAssociationEnd();
@@ -344,8 +346,9 @@ public class JavaAnalyser {
 						}
 						if (!isAlsoAnAttribute) {
 							UMLSourceTargetRelation newDependency = new UMLSourceTargetRelation();
+							newDependency.setMyClassId(c.getId());
 							newDependency.setId(Integer.toString(++uniqueID));
-							newDependency.setDependencyType("UMLDependency");
+							newDependency.setSourceTargetType("UMLDependency");
 							newDependency.setName("Utilise");
 							newDependency.setSource(c.getId());
 							newDependency.setTarget(diagram.getClassWithName(p.getType()).getId());
@@ -356,9 +359,9 @@ public class JavaAnalyser {
 			}
 			if (!c.getExtendedClass().equals("")) {
 				UMLSourceTargetRelation newDependency = new UMLSourceTargetRelation();
+				newDependency.setMyClassId(c.getId());
 				newDependency.setId(Integer.toString(++uniqueID));
-				newDependency.setDependencyType("UMLGeneralization");
-				;
+				newDependency.setSourceTargetType("UMLGeneralization");
 				newDependency.setName("Hérite de");
 				newDependency.setSource(c.getId());
 				newDependency.setTarget(diagram.getClassWithName(c.getExtendedClass()).getId());
@@ -368,8 +371,9 @@ public class JavaAnalyser {
 			
 			for (String implementedClass : c.getImplementedClasses()) {
 				UMLSourceTargetRelation newDependency = new UMLSourceTargetRelation();
+				newDependency.setMyClassId(c.getId());
 				newDependency.setId(Integer.toString(++uniqueID));
-				newDependency.setDependencyType("UMLInterfaceRealization");
+				newDependency.setSourceTargetType("UMLInterfaceRealization");
 				newDependency.setName("Implémente");
 				newDependency.setSource(c.getId());
 				newDependency.setTarget(diagram.getClassWithName(implementedClass).getId());
@@ -379,12 +383,12 @@ public class JavaAnalyser {
 		}
 	}
 
-	public void generateJsonFile(UMLDiagram diagram) {
+	public void generateJsonFile(UMLDiagram diagram) throws JSONException {
 		MdjGenerator j = new MdjGenerator();
-		j.generateJsonFileFromDiagram("Dossier contenant les fichiers de sortie à renseigner !", diagram);
+		j.generateJsonFileFromDiagram("C:\\Users\\mathy\\Documents\\PTUT\\JsonGeneration", diagram);
 	}
 
-	public void startAnalyse() throws IOException {
+	public void startAnalyse() throws IOException, JSONException {
 		listFilesForFolder(folder);
 		UMLDiagram d = analyseFiles();
 		generateJsonFile(d);

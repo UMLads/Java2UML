@@ -1,5 +1,8 @@
 package fr.uml2java;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class UMLParameter extends UMLAttribute {
     boolean isReturn;
     private String myOperationId;
@@ -59,5 +62,17 @@ public class UMLParameter extends UMLAttribute {
 
     public void setParent(String parent) {
         super.setParent(parent);
+    }
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject parameter = new JSONObject();
+        parameter.put("_type", "UMLParameter");
+        parameter.put("_id", getId());
+        JSONObject parent = new JSONObject();
+        parent.put("$ref", getMyOperationId());
+        parameter.put("_parent", parent);
+        parameter.put("name", getName());
+        parameter.put("type", getType());
+        return parameter;
     }
 }

@@ -1,12 +1,7 @@
 package fr.uml2java;
-
-import java.io.FileNotFoundException;
-
+import fr.java2uml.JavaAnalyser;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import fr.java2uml.*;
+import org.json.*;
 
 public class Main {
 	/*
@@ -19,8 +14,13 @@ public class Main {
     */
     
 	//Java -> UML
-    public static void main(String[] args) throws IOException {
+
+    public static void main(String[] args) throws IOException, JSONException {
 		JavaAnalyser j = new JavaAnalyser();
 		j.startAnalyse();
-    }
+	}
+
+
+
+
 }
