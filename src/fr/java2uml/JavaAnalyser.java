@@ -21,8 +21,8 @@ public class JavaAnalyser {
 
 	public static int uniqueID;
 
-	private List<File> files = new ArrayList<>();
-	private String outputFolder;
+	private final List<File> files = new ArrayList<>();
+	private final String outputFolder;
 	private final File folderToAnalyse;
 	public JavaAnalyser(String inputFolder, String outputFolder) {
 		this.outputFolder = outputFolder;
@@ -61,10 +61,7 @@ public class JavaAnalyser {
 			} else if (word.equals("extends")) {
 				returnClass.setAbstract();
 				step = "extends";
-			} else if (step.equals("name")
-					&& (!word.equals("public") && !word.equals("private") && !word.equals("protected")
-							&& !word.equals("abstract") && !word.equals("class") && !word.equals("interface")
-							&& !word.equals("final") && !word.equals("implements") && !word.equals("extends"))) {
+			} else if (step.equals("name") && !word.equals("public") && !word.equals("private") && !word.equals("protected") && !word.equals("final")) {
 				if (word.contains("{")) {
 					breakAfter = true;
 					word = word.replace("{", "");
@@ -74,10 +71,7 @@ public class JavaAnalyser {
 				if (breakAfter) {
 					break;
 				}
-			} else if (step.equals("extends")
-					&& (!word.equals("public") && !word.equals("private") && !word.equals("protected")
-							&& !word.equals("abstract") && !word.equals("class") && !word.equals("interface")
-							&& !word.equals("final") && !word.equals("implements") && !word.equals("extends"))) {
+			} else if (step.equals("extends") && !word.equals("public") && !word.equals("private") && !word.equals("protected") && !word.equals("final")) {
 				if (word.contains("{")) {
 					breakAfter = true;
 					word = word.replace("{", "");
@@ -87,10 +81,7 @@ public class JavaAnalyser {
 				if (breakAfter) {
 					break;
 				}
-			} else if (step.equals("implements") && (!word.equals("public") && !word.equals("private")
-					&& !word.equals("protected") && !word.equals("abstract") && !word.equals("class")
-					&& !word.equals("interface") && !word.equals("final") && !word.equals("implements")
-					&& !word.equals("extends") && !word.equals(","))) {
+			} else if (step.equals("implements") && !word.equals("public") && !word.equals("private") && !word.equals("protected") && !word.equals("final") && !word.equals(",")) {
 
 				word = word.replace("{", "");
 				String[] implementedClasses = word.split(",");
@@ -285,17 +276,17 @@ public class JavaAnalyser {
 	public UMLDiagram analyseFiles() throws IOException {
 		UMLDiagram newDiagram = new UMLDiagram();
 		for (File file : files) {
-			String classString = "";
+			StringBuilder classString = new StringBuilder();
 			UMLClass newClass = new UMLClass();
 			newClass.setId(Integer.toString(++uniqueID));
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			while (reader.ready()) {
 				String line = reader.readLine();
-				classString += line;
+				classString.append(line);
 			}
 
-			classString = formatClassString(classString);
-			newClass = analyseClass(classString, newClass);
+			classString = new StringBuilder(formatClassString(classString.toString()));
+			newClass = analyseClass(classString.toString(), newClass);
 			List<UMLClass> newClasses = newDiagram.getMyClasses();
 			newClasses.add(newClass);
 			newDiagram.setMyClasses(newClasses);
@@ -342,7 +333,7 @@ public class JavaAnalyser {
 					if (diagram.getClassWithName(p.getType()) != null) {
 						boolean isAlsoAnAttribute = false;
 						for (UMLAttribute a : c.getAttributes()) {
-							if (a.getType() == p.getType()) {
+							if (Objects.equals(a.getType(), p.getType())) {
 								isAlsoAnAttribute = true;
 							}
 						}
