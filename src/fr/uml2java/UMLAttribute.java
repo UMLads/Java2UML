@@ -23,7 +23,7 @@ public class UMLAttribute extends UMLObject {
     public String toString() {
         String s = super.toString();
         s = s.substring(0, s.length() - 2);
-        return s + " type : "  + type + '\n';
+        return s + " type : "  + getType() + '\n';
     }
 
     public UMLAttribute() {

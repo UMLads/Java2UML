@@ -15,8 +15,8 @@ public class UMLAssociationEnd extends UMLObject {
         String s = super.toString();
         s = s.substring(0, s.length() - 2);
         return  s + " with visibility : "
-                + visibility + "; with multiplicity : " + multiplicity
-                + "; pointing to class with id : " + reference + '\n';
+                + getVisibility() + "; with multiplicity : " + getMultiplicity()
+                + "; pointing to class with id : " + getReference() + '\n';
     }
 
     public String getAggregationType() {

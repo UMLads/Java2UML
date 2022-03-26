@@ -1,5 +1,7 @@
 package fr.uml2java;
 
+import fr.java2uml.IdGenerator;
+
 import java.util.ArrayList;
 
 public class UMLObject {
@@ -8,6 +10,7 @@ public class UMLObject {
     private String parent = "";
     private boolean derived;
     private boolean _static;
+    protected IdGenerator idGenerator = IdGenerator.getInstance();
 
     @Override
     public String toString() {

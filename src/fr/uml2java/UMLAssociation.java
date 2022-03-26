@@ -1,6 +1,7 @@
 package fr.uml2java;
 
 
+import fr.java2uml.IdGenerator;
 import fr.java2uml.JavaAnalyser;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,7 +71,7 @@ public class UMLAssociation extends UMLObject {
     public JSONObject toJsonView() throws JSONException {
         JSONObject associationView = new JSONObject();
         associationView.put("_type", "UMLAssociationView");
-        associationView.put("_id", Integer.toString(++JavaAnalyser.uniqueID));
+        associationView.put("_id", idGenerator.createId());
         JSONObject parent = new JSONObject();
         parent.put("$ref", "diagram_id");
         associationView.put("_parent", parent);

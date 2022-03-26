@@ -75,7 +75,7 @@ public class UMLSourceTargetRelation extends UMLObject {
     public JSONObject toJsonView() throws JSONException {
         JSONObject sourceTargetRelationView = new JSONObject();
         sourceTargetRelationView.put("_type", getSourceTargetType()+"View");
-        sourceTargetRelationView.put("_id", Integer.toString(++JavaAnalyser.uniqueID));
+        sourceTargetRelationView.put("_id", idGenerator.createId());
         JSONObject parent = new JSONObject();
         parent.put("$ref", "diagram_id");
         sourceTargetRelationView.put("_parent", parent);

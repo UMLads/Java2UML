@@ -1,5 +1,6 @@
 package fr.uml2java;
 
+import fr.java2uml.IdGenerator;
 import fr.java2uml.JavaAnalyser;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,17 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UMLOperation extends UMLObject {
+
     private List<UMLParameter> umlParameters;
     private boolean isAbstract = false;
     private boolean isStatic = false;
-
     private String myClassId;
     private String returnType;
     private String visibility;
-    
 
-    
-    
     public String getVisibility() {
 		return visibility;
 	}
@@ -37,17 +35,17 @@ public class UMLOperation extends UMLObject {
 	}
 
 	public UMLOperation() {
-        umlParameters = new ArrayList<>();
+        setUmlParameters(new ArrayList<>());
     }
 
     @Override
     public String toString() {
-        String s = super.toString();
-        s = s.substring(0, s.length()-2) + ((isAbstract) ? " isAbstract;" : "") + " with parameters :\n";
+        StringBuilder s = new StringBuilder(super.toString());
+        s = new StringBuilder(s.substring(0, s.length() - 2) + ((isAbstract) ? " isAbstract;" : "") + " with parameters :\n");
         for (UMLParameter umlParameter : umlParameters) {
-            s += "\t\t\t" + umlParameter.toString();
+            s.append("\t\t\t").append(umlParameter.toString());
         }
-        return s;
+        return s.toString();
     }
 
     public void addParameter(UMLParameter umlParameter) {
@@ -133,7 +131,7 @@ public class UMLOperation extends UMLObject {
     public JSONObject getJsonReturnParameter() throws JSONException {
         JSONObject returnParameter = new JSONObject();
         returnParameter.put("_type", "UMLParameter");
-        returnParameter.put("_id", Integer.toString(++JavaAnalyser.uniqueID));
+        returnParameter.put("_id", idGenerator.createId());
         JSONObject parent = new JSONObject();
         parent.put("$ref", getId());
         returnParameter.put("_parent", parent);

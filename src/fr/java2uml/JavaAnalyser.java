@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import fr.uml2java.UMLAssociation;
 import fr.uml2java.UMLAssociationEnd;
@@ -18,16 +19,18 @@ import fr.uml2java.UMLParameter;
 import org.json.JSONException;
 
 public class JavaAnalyser {
-
-	public static int uniqueID;
-
 	private final List<File> files = new ArrayList<>();
 	private final String outputFolder;
 	private final File folderToAnalyse;
-	public JavaAnalyser(String inputFolder, String outputFolder) {
+	private IdGenerator idGenerator;
+
+	public JavaAnalyser(String inputFolder, String outputFolder) throws IOException {
 		this.outputFolder = outputFolder;
 		folderToAnalyse = new File(inputFolder);
+		idGenerator = IdGenerator.getInstance();
+		startAnalyse();
 	}
+
 
 	public void listFilesForFolder(File folder) {
 		for (File fileEntry : Objects.requireNonNull(folder.listFiles())) {
@@ -102,7 +105,7 @@ public class JavaAnalyser {
 
 	public UMLClass analyseOperation(String pieceOfCode, UMLClass returnClass) {
 		UMLOperation newOperation = new UMLOperation();
-		newOperation.setId(Integer.toString(++uniqueID));
+		newOperation.setId(idGenerator.createId());
 		newOperation.setMyClassId(returnClass.getId());
 		boolean returnTypeBoolean = false;
 		String[] keyWords = pieceOfCode.substring(0, pieceOfCode.indexOf("(")).split(" ");
@@ -163,7 +166,7 @@ public class JavaAnalyser {
 				returnType = true;
 			} else {
 				newParameter.setName(word.replace(",", ""));
-				newParameter.setId(Integer.toString(++uniqueID));
+				newParameter.setId(idGenerator.createId());
 				newParameter.setMyClassId(operation.getMyClassId());
 				newParameter.setMyOperationId(operation.getId());
 
@@ -177,7 +180,7 @@ public class JavaAnalyser {
 
 	public UMLClass analyseAttribute(String pieceOfCode, UMLClass returnClass) {
 		UMLAttribute newAttribute = new UMLAttribute();
-		newAttribute.setId(Integer.toString(++uniqueID));
+		newAttribute.setId(idGenerator.createId());
 		newAttribute.setMyClassId(returnClass.getId());
 		String[] words = pieceOfCode.split(" ");
 		boolean returnType = false;
@@ -278,7 +281,7 @@ public class JavaAnalyser {
 		for (File file : files) {
 			StringBuilder classString = new StringBuilder();
 			UMLClass newClass = new UMLClass();
-			newClass.setId(Integer.toString(++uniqueID));
+			newClass.setId(idGenerator.createId());
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			while (reader.ready()) {
 				String line = reader.readLine();
@@ -302,13 +305,13 @@ public class JavaAnalyser {
 				if (diagram.getClassWithName(a.getType()) != null) {
 					UMLAssociation newAssociation = new UMLAssociation();
 					newAssociation.setMyClassId(c.getId());
-					newAssociation.setId(Integer.toString(++uniqueID));
+					newAssociation.setId(idGenerator.createId());
 					newAssociation.setName("Est compose de");
 					UMLAssociationEnd end1 = new UMLAssociationEnd();
 					UMLAssociationEnd end2 = new UMLAssociationEnd();
-					end2.setId(Integer.toString(++uniqueID));
+					end2.setId(idGenerator.createId());
 					end2.setAssociatedClassId(c.getId());
-					end1.setId(Integer.toString(++uniqueID));
+					end1.setId(idGenerator.createId());
 					end1.setAssociatedClassId(diagram.getClassWithName(a.getType()).getId());
 					end1.setName(a.getName());
 					end2.setAggregationType("shared");
@@ -340,7 +343,7 @@ public class JavaAnalyser {
 						if (!isAlsoAnAttribute) {
 							UMLSourceTargetRelation newDependency = new UMLSourceTargetRelation();
 							newDependency.setMyClassId(c.getId());
-							newDependency.setId(Integer.toString(++uniqueID));
+							newDependency.setId(idGenerator.createId());
 							newDependency.setSourceTargetType("UMLDependency");
 							newDependency.setName("Utilise");
 							newDependency.setSource(c.getId());
@@ -353,7 +356,7 @@ public class JavaAnalyser {
 			if (!c.getExtendedClass().equals("")) {
 				UMLSourceTargetRelation newDependency = new UMLSourceTargetRelation();
 				newDependency.setMyClassId(c.getId());
-				newDependency.setId(Integer.toString(++uniqueID));
+				newDependency.setId(idGenerator.createId());
 				newDependency.setSourceTargetType("UMLGeneralization");
 				newDependency.setName("Hérite de");
 				newDependency.setSource(c.getId());
@@ -365,7 +368,7 @@ public class JavaAnalyser {
 			for (String implementedClass : c.getImplementedClasses()) {
 				UMLSourceTargetRelation newDependency = new UMLSourceTargetRelation();
 				newDependency.setMyClassId(c.getId());
-				newDependency.setId(Integer.toString(++uniqueID));
+				newDependency.setId(idGenerator.createId());
 				newDependency.setSourceTargetType("UMLInterfaceRealization");
 				newDependency.setName("Implémente");
 				newDependency.setSource(c.getId());
@@ -387,5 +390,7 @@ public class JavaAnalyser {
 		generateJsonFile(d);
 
 	}
+
+
 
 }

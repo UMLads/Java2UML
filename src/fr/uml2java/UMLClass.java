@@ -18,33 +18,33 @@ public class UMLClass extends UMLObject {
     private ArrayList<UMLSourceTargetRelation> umlSourceTargetRelations;
 
     private String extendedClass = "";
-    private ArrayList<String> implementedClasses = new ArrayList<>();
+    private final ArrayList<String> implementedClasses = new ArrayList<>();
 
 	@Override
     public String toString() {
-        String s = super.toString();
-        s = s.substring(0, s.length()-2) + ((isAbstract) ? " isAbstract;" : "") + " contains :\n";
-        s += "\tattributes : \n";
-        for (UMLAttribute umlAttribute : attributes) {
-            s += "\t\t" + umlAttribute.toString();
+        StringBuilder s = new StringBuilder(super.toString());
+        s = new StringBuilder(s.substring(0, s.length() - 2) + ((isAbstract()) ? " isAbstract;" : "") + " contains :\n");
+        s.append("\tattributes : \n");
+        for (UMLAttribute umlAttribute : getAttributes()) {
+            s.append("\t\t").append(umlAttribute.toString());
         }
-        s += "\toprations : \n";
-        for (UMLOperation umlOperation : operations) {
-            s += "\t\t" + umlOperation.toString();
+        s.append("\toprations : \n");
+        for (UMLOperation umlOperation : getOperations()) {
+            s.append("\t\t").append(umlOperation.toString());
         }
-        s += "\towned elements : \n";
-        for (UMLAssociation umlAssociation : associations) {
-            s += "\t\t" + umlAssociation.toString();
+        s.append("\towned elements : \n");
+        for (UMLAssociation umlAssociation : getAssociations()) {
+            s.append("\t\t").append(umlAssociation.toString());
         }
-        return s;
+        return s.toString();
     }
 
     public UMLClass() {
         super();
-        attributes = new ArrayList<>();
-        operations = new ArrayList<>();
-        associations = new ArrayList<>();
-        umlSourceTargetRelations = new ArrayList<>();
+        setAttributes(new ArrayList<>());
+        setOperations(new ArrayList<>());
+        setAssociations(new ArrayList<>());
+        setUmlSourceTargetRelations(new ArrayList<>());
     }
 
     public ArrayList<UMLAttribute> getAttributes() {
@@ -114,15 +114,6 @@ public class UMLClass extends UMLObject {
     public void addAttribute(UMLAttribute umlAttribute) {
         attributes.add(umlAttribute);
     }
-    
-    public void removeAttribute(String umlAttributeName) {
-        for(UMLAttribute attribute : attributes) {
-        	if(attribute.getName().equals(umlAttributeName)) {
-        		attributes.remove(attribute);
-        		break;
-        	}
-        }
-    }
 
     public void removeAttribute(UMLAttribute umlAttribute) {
         attributes.remove(umlAttribute);
@@ -138,11 +129,6 @@ public class UMLClass extends UMLObject {
     
     public void addDependency(UMLSourceTargetRelation newDependency) {
         umlSourceTargetRelations.add(newDependency);
-    }
-    
-
-    public UMLAttribute getLastAtt() {
-        return attributes.get(attributes.size() - 1);
     }
 
     public boolean isAbstract() {
