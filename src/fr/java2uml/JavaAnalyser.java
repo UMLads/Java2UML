@@ -19,7 +19,6 @@ import org.json.JSONException;
 
 public class JavaAnalyser {
 
-	//PENSER A MODIFIER LES STRING ligne 23 et 384
 	public static int uniqueID;
 
 	private List<File> files = new ArrayList<>();
